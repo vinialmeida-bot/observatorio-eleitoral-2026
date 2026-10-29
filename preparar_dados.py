@@ -18,6 +18,8 @@ from pathlib import Path
 ARQUIVO = Path(r"H:\votacao_candidato_munzona_2026\votacao_candidato_munzona_2026_BRASIL.csv")
 SAIDA = Path(__file__).resolve().parent / "dados_eleicao_2026.json"
 UFS = set("AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split())
+REGIOES = UFS | {"ZZ"}  # ZZ = votacao no exterior, mantida em grupo separado
+TOTAIS_OFICIAIS = {1: 119_300_788, 2: 124_082_273}
 COLUNAS = {
     "ANO_ELEICAO", "NR_TURNO", "DS_CARGO", "SG_UF",
     "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_CANDIDATO",
@@ -76,8 +78,8 @@ def main():
             linhas_turno[turno] += 1
 
             uf = linha["SG_UF"].strip().upper()
-            if uf not in UFS:
-                linhas_excluidas[f"uf_fora_das_27_{uf or 'VAZIA'}"] += 1
+            if uf not in REGIOES:
+                linhas_excluidas[f"uf_nao_identificada_{uf or 'VAZIA'}"] += 1
                 continue
 
             cod_municipio = linha["CD_MUNICIPIO"].strip()
@@ -108,7 +110,7 @@ def main():
     for turno in (1, 2):
         print(f"Turno {turno}: {linhas_turno[turno]:,} linhas de presidente, "
               f"{len({n for t, n in candidatos if t == turno})} candidatos, "
-              f"{votos_por_turno[turno]:,} votos validos nas 27 UFs")
+              f"{votos_por_turno[turno]:,} votos validos nas 27 UFs e no exterior")
     print("Municipios/turnos agregados:", f"{len(municipios):,}")
     print("Linhas ignoradas por motivo:", dict(linhas_excluidas))
 
@@ -117,7 +119,21 @@ def main():
               "Nao sera gerado JSON para publicacao.")
         sys.exit(2)
 
-    # Total nacional e por UF, SEM adicionar linhas de BR/VT/ZZ.
+    # Reconciliacao automatica antes de exportar resultados para o site.
+    divergencias = []
+    for turno in (1, 2):
+        apurado = votos_por_turno[turno]
+        esperado = TOTAIS_OFICIAIS[turno]
+        if apurado != esperado:
+            divergencias.append((turno, apurado, esperado))
+        print(f"Conferencia TSE - turno {turno}: arquivo={apurado:,}; referencia={esperado:,}; "
+              f"status={'OK' if apurado == esperado else 'DIVERGENTE'}")
+    if divergencias:
+        print("ATENCAO: o arquivo nao coincide com os totais nacionais de referencia.")
+        print("Nao sera criado JSON novo. Confira data/versao e dados do arquivo.")
+        sys.exit(3)
+
+    # Total nacional: 27 UFs + exterior (ZZ), sem duplicar linhas sinteticas BR/VT.
     totais = defaultdict(lambda: defaultdict(int))
     estados = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     registros = []
@@ -134,13 +150,14 @@ def main():
         })
 
     resultado = {
-        "versao": 1,
+        "versao": 2,
         "fonte": "TSE - votacao_candidato_munzona_2026_BRASIL.csv",
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "observacoes": [
             "Votos nominais validos para presidente, agregados por municipio e turno.",
             "Nao contem votos brancos, nulos, comparecimento ou abstencoes.",
-            "SG_UF BR, VT e ZZ nao entram no total; votos no exterior e em transito precisam de tratamento separado.",
+            "O total nacional inclui as 27 UFs e o exterior (ZZ); BR e VT nao sao somados.",
+            "A chave ZZ no objeto estados representa os votos no exterior, nao uma unidade federativa.",
             "Conferir os totais com a apuracao oficial antes de publicar."
         ],
         "candidatos": {
@@ -150,6 +167,7 @@ def main():
             ) for turno in (1, 2)
         },
         "nacional": {str(t): dict(totais[t]) for t in (1, 2)},
+        "totais_conferidos": {str(t): votos_por_turno[t] for t in (1, 2)},
         "estados": {
             str(t): {uf: dict(v) for uf, v in sorted(estados[t].items())}
             for t in (1, 2)
