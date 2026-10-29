@@ -169,8 +169,6 @@ def membro_principal(z):
               "detalhe_votacao_munzona_2026_brasil.csv"]
     if len(brasil) == 1:
         return brasil[0]
-    if len(csvs) == 1:
-        return csvs[0]
     raise ValueError("CSV BRASIL nao encontrado de forma inequivoca: " + str(csvs[:20]))
 
 
