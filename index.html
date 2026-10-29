@@ -3,94 +3,230 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#086044">
-<meta name="description" content="Observatório Eleitoral 2026: dados de votação explicados de forma simples.">
-<title>Observatório Eleitoral 2026</title>
+<meta name="theme-color" content="#086247">
+<meta name="description" content="Entenda os votos das eleições presidenciais de 2026 com dados do TSE e linguagem simples.">
+<title>Observatório Eleitoral 2026 | Entenda os votos</title>
 <style>
-:root{--green:#106847;--ink:#17342c;--muted:#536960;--bg:#f5f8f6;--line:#dce6e0;--gold:#eabc49;--blue:#3486bb;--orange:#d18b3a}
-*{box-sizing:border-box}html{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;font-size:16px}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55}button{font:inherit}a{color:#086a4a}a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-header{background:linear-gradient(110deg,#06452f,#187856);color:#fff;padding:34px max(20px,calc((100vw - 1120px)/2)) 32px}
-.brand{font-size:.8rem;letter-spacing:.13em;font-weight:800;color:#d9eee5}.hero{font-size:clamp(1.7rem,4.5vw,2.7rem);line-height:1.17;margin:12px 0}.hero-desc{font-size:1.05rem;color:#e3f2eb;max-width:760px}.flag{display:inline-block;background:#ffe8a9;color:#553b08;padding:7px 11px;border-radius:6px;font-weight:750;font-size:.78rem;margin-top:14px}
-main{max-width:1120px;margin:0 auto;padding:20px}.notice{background:#e9f3ed;border-left:4px solid var(--green);border-radius:8px;padding:13px 16px;margin:0 0 20px;font-size:.94rem}
-.tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}.tabs button{cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;color:var(--ink);font-weight:700}.tabs button[aria-selected=true]{background:var(--green);color:#fff;border-color:var(--green)}
-.panel{background:#fff;border:1px solid var(--line);padding:22px;border-radius:14px;margin:14px 0;box-shadow:0 2px 8px #143b2210}h2{font-size:1.5rem;line-height:1.25;margin:3px 0 10px}h3{font-size:1.08rem;margin:4px 0 8px}p{margin:5px 0 12px}.sub{color:var(--muted)}
-.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:17px 0}.metric{border-radius:10px;border:1px solid var(--line);padding:16px;background:#fafdfb}.metric strong{display:block;font-size:1.45rem;margin-top:4px}.metric span{font-size:.88rem;color:var(--muted)}
-.pending{color:#5f7269;font-weight:650}.empty{padding:25px;background:#f5f7f5;border:1px dashed #afc5b8;border-radius:11px;margin-top:13px;text-align:center}.empty strong{display:block;font-size:1.08rem}.empty p{color:var(--muted);margin-top:8px}
-.def{border-top:1px solid var(--line);padding:14px 0}.def:first-child{border-top:0}.def strong{display:block}.explain{background:#fff8e5;border-left:4px solid var(--gold);border-radius:7px;padding:12px 14px;margin:12px 0}.step{font-weight:800;color:var(--green);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}.pill{display:inline-block;border-radius:20px;padding:5px 10px;background:#edf5ef;color:#165d43;font-size:.82rem;font-weight:650}
-footer{padding:20px;max-width:1120px;margin:auto;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)}section[hidden]{display:none}
-@media(max-width:680px){main{padding:12px}header{padding:24px 18px}.panel{padding:15px}.cols,.metrics{grid-template-columns:1fr}.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.tabs button{font-size:.9rem;text-align:left}}
+:root{--dark:#103d2f;--green:#087653;--light:#f4f8f6;--paper:#fff;--line:#dce7e1;--text:#20352f;--muted:#567169;--yellow:#f3b944;--blue:#287eba;--orange:#df9039;--gray:#899b95}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;margin:0;background:var(--light);color:var(--text)}
+button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #eebf50;outline-offset:3px}
+header{background:linear-gradient(110deg,#053c2b,#127c59);color:#fff;padding:26px max(16px,calc((100vw - 1160px)/2));}
+.kicker{font-size:.77rem;letter-spacing:.14em;font-weight:800;color:#d4eddd}h1{font-size:clamp(1.7rem,3.4vw,2.6rem);letter-spacing:-.04em;line-height:1.15;margin:9px 0}header p{color:#e0eee6;margin:4px 0;max-width:800px}.verified{display:inline-block;margin-top:13px;font-size:.8rem;background:#ffecb6;color:#593c0d;padding:6px 10px;border-radius:6px;font-weight:800}
+main{max-width:1160px;padding:20px 16px;margin:auto}.notice{border-left:4px solid var(--green);padding:13px 15px;border-radius:8px;background:#e5f2ea;margin-bottom:14px;font-size:.95rem}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fff;font-size:.9rem;font-weight:700;color:var(--text)}nav button[aria-selected="true"]{background:var(--green);color:white;border-color:var(--green)}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:14px 0}.filters label,.field{display:flex;flex-direction:column;gap:5px;min-width:175px;font-size:.85rem;font-weight:700;color:var(--muted)}select,input{background:#fff;border:1px solid #bfcfc7;border-radius:8px;padding:10px;color:var(--text);max-width:100%}#region{min-width:230px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:20px;margin-bottom:13px;box-shadow:0 2px 7px #18452e0b}h2{margin:0 0 8px;font-size:1.45rem;letter-spacing:-.02em;line-height:1.2}h3{margin:0 0 9px;font-size:1.08rem}.sub{margin:0 0 14px;color:var(--muted);font-size:.93rem}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 15px}
+.kpi{border-radius:9px;background:#f3f8f5;padding:13px;min-width:0}.kpi small{display:block;color:var(--muted)}.kpi strong{display:block;font-size:clamp(1.18rem,2.6vw,1.72rem);letter-spacing:-.03em;overflow-wrap:anywhere}
+.tip{border-left:4px solid var(--yellow);background:#fff9e9;border-radius:7px;padding:11px 13px;margin:13px 0;font-size:.93rem}.bar-item{margin:12px 0}.bar-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:.89rem}.bar-top strong{text-align:right;white-space:nowrap}.track{height:13px;background:#e9f0ec;overflow:hidden;border-radius:4px}.barfill{height:100%;min-width:0;border-radius:4px}.bar-detail{font-size:.78rem;color:var(--muted);margin-top:3px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem}.row strong{text-align:right}.row:last-child{border:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.statbox{background:#f4f8f6;border-radius:10px;padding:13px}.statbox small{display:block;color:var(--muted)}.statbox strong{display:block;font-size:1.5rem;margin-top:6px}
+.pairbar{height:22px;display:flex;border-radius:5px;overflow:hidden;margin:10px 0;background:#eaf0ed}.pairbar span{height:100%}.statebar{display:grid;grid-template-columns:40px 1fr 105px;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:9px 2px;font-size:.85rem}.statebar strong{text-align:right}.statebar button{background:transparent;border:0;text-decoration:underline;text-decoration-color:#99b7a4;color:var(--text);padding:4px;text-align:left;font-weight:700}
+.tablewrap{max-height:470px;overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:.89rem;min-width:550px}th{background:#f2f7f4;color:var(--muted);position:sticky;top:0;text-align:left;padding:10px;white-space:nowrap}td{border-top:1px solid var(--line);padding:10px}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.small{font-size:.83rem;color:var(--muted)}.empty{border:1px dashed #a8bdb1;background:#f5f8f6;border-radius:9px;padding:18px;margin:10px 0}.button{display:inline-block;background:var(--green);color:#fff;border:0;border-radius:8px;padding:10px 13px;font-weight:700}.button.secondary{background:#fff;color:var(--green);border:1px solid #95b4a4}
+.definition{padding:12px 0;border-top:1px solid var(--line)}.definition strong{display:block}.spacer{margin-top:16px}.status{font-size:.9rem;font-weight:700}.muted{color:var(--muted)}footer{max-width:1160px;margin:auto;padding:15px 16px 35px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line)}
+[hidden]{display:none!important}
+@media(max-width:680px){.cols,.stats{grid-template-columns:1fr}main{padding:12px}.panel{padding:15px}nav{display:grid;grid-template-columns:1fr 1fr}nav button{text-align:left;font-size:.86rem}.filters label{width:100%}.grid2{grid-template-columns:1fr 1fr}h1{font-size:1.85rem}.statebar{grid-template-columns:35px 1fr 90px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">OBSERVATÓRIO ELEITORAL · BRASIL 2026</div>
-  <h1 class="hero">Entenda os números da eleição</h1>
-  <p class="hero-desc">Resultados, candidatos, municípios e participação eleitoral em linguagem simples, com explicações ao lado de cada análise.</p>
-  <span class="flag">SITE EM PREPARAÇÃO · RESULTADOS AINDA NÃO PUBLICADOS</span>
+<div class="kicker">DADOS ELEITORAIS EXPLICADOS</div>
+<h1>Observatório Eleitoral 2026</h1>
+<p>Quem recebeu mais votos? O que mudou entre os turnos? Como votaram os estados, os municípios e os brasileiros no exterior?</p>
+<span id="verification" class="verified">Conectando os resultados do TSE</span>
 </header>
 <main>
- <p class="notice"><strong>Transparência:</strong> esta é a primeira versão do site. Ainda não carregamos os números oficiais. Nenhum resultado eleitoral é apresentado sem conferir os dados do TSE.</p>
- <nav class="tabs" aria-label="Áreas de análise">
-  <button type="button" aria-selected="true" data-tab="resultados">Quem recebeu mais votos?</button>
-  <button type="button" aria-selected="false" data-tab="comparacao">Comparar 1 × 1</button>
-  <button type="button" aria-selected="false" data-tab="turnos">1º × 2º turno</button>
-  <button type="button" aria-selected="false" data-tab="participacao">Quem votou?</button>
-  <button type="button" aria-selected="false" data-tab="municipios">Municípios</button>
- </nav>
- <section id="resultados" aria-labelledby="rtitle">
-  <div class="panel"><div class="step">Visão geral</div><h2 id="rtitle">Quem recebeu mais votos?</h2><p class="sub">Todos os candidatos do primeiro turno, do mais votado para o menos votado. Você poderá escolher um estado e ver como os resultados mudam.</p>
-   <div class="metrics"><div class="metric"><span>Votos válidos</span><strong class="pending">Aguardando dados</strong></div><div class="metric"><span>Candidatura mais votada</span><strong class="pending">Aguardando dados</strong></div><div class="metric"><span>Municípios analisados</span><strong class="pending">Aguardando dados</strong></div></div>
-   <div class="empty"><strong>Gráfico de candidatos</strong><p>Ele aparecerá aqui depois que processarmos e verificarmos o CSV oficial.</p></div>
-   <div class="explain"><strong>O que significa percentual de votos válidos?</strong> Se um candidato tiver 40%, isso significa que ele recebeu 40 de cada 100 votos válidos. Votos brancos, nulos e ausências não entram nessa conta.</div>
-  </div>
- </section>
- <section id="comparacao" hidden aria-labelledby="ctitle">
-  <div class="panel"><div class="step">Comparação direta</div><h2 id="ctitle">Qual foi a diferença entre dois candidatos?</h2><p class="sub">Você poderá selecionar qualquer par de candidatos e descobrir quem recebeu mais votos em cada estado e município.</p>
-  <div class="cols"><div class="metric"><span>Candidato A</span><strong class="pending">Seleção disponível com os dados</strong></div><div class="metric"><span>Candidato B</span><strong class="pending">Seleção disponível com os dados</strong></div></div>
-  <div class="empty"><strong>Comparação 1 × 1</strong><p>Exibiremos as duas votações em barras lado a lado, com a diferença explicada.</p></div>
-  <div class="def"><strong>Diferença em votos</strong>É a quantidade de votos de um candidato menos a do outro. Exemplo: 120.000 contra 100.000 significa 20.000 votos de diferença.</div>
-  <div class="def"><strong>Diferença em pontos percentuais (p.p.)</strong>É a distância entre duas porcentagens. Exemplo: 45% menos 40% = 5 pontos percentuais. Não é o mesmo que dizer 5% de aumento.</div>
-  <div class="explain">Comparar dois candidatos do primeiro turno não é simular um segundo turno. É apenas analisar os votos realmente registrados para cada candidatura.</div>
-  </div>
- </section>
- <section id="turnos" hidden aria-labelledby="ttitle">
-  <div class="panel"><div class="step">Mudanças da eleição</div><h2 id="ttitle">O que mudou do primeiro para o segundo turno?</h2><p class="sub">Vamos comparar as votações dos finalistas, a diferença entre eles e a participação dos eleitores nos dois turnos.</p>
-  <div class="cols"><div class="metric"><span>Primeiro turno</span><strong class="pending">Aguardando validação</strong></div><div class="metric"><span>Segundo turno</span><strong class="pending">Aguardando validação</strong></div></div>
-  <div class="empty"><strong>Gráficos de evolução entre turnos</strong><p>Os resultados aparecerão quando confirmarmos os dois turnos no arquivo do TSE.</p></div>
-  <div class="def"><strong>Ganhou votos</strong>O candidato recebeu mais votos no segundo turno do que no primeiro, considerando o mesmo território.</div>
-  <div class="def"><strong>Ganhou pontos percentuais</strong>A participação dele nos votos válidos aumentou. Isso pode ocorrer mesmo que o total de votos varie pouco, pois o total de votos válidos também pode mudar.</div>
-  <div class="def"><strong>O saldo mudou</strong>A diferença de votos entre os dois finalistas aumentou ou diminuiu de um turno para o outro.</div>
-  <div class="explain"><strong>Importante:</strong> os totais por turno não permitem saber como cada eleitor votou nas duas datas. Portanto, não afirmaremos que votos foram transferidos de um candidato para outro.</div>
-  </div>
- </section>
- <section id="participacao" hidden aria-labelledby="ptitle">
-  <div class="panel"><div class="step">Participação eleitoral</div><h2 id="ptitle">Quantas pessoas votaram ou faltaram?</h2><p class="sub">Vamos mostrar quantos eleitores estavam aptos, quantos compareceram e como os votos foram registrados em cada turno.</p>
-  <div class="empty"><strong>Gráficos de comparecimento e tipos de voto</strong><p>Para calcular esses indicadores corretamente, integraremos os arquivos de comparecimento e apuração do TSE.</p></div>
-  <div class="def"><strong>Comparecimento</strong>Quantidade de eleitores que foram votar.</div>
-  <div class="def"><strong>Abstenção</strong>Quantidade de eleitores aptos que não compareceram. A taxa é calculada sobre o eleitorado apto.</div>
-  <div class="def"><strong>Voto em branco</strong>Voto registrado na opção “branco”. Não é atribuído a candidato.</div>
-  <div class="def"><strong>Voto nulo</strong>Voto registrado sem escolha válida de candidatura. Não é atribuído a candidato.</div>
-  <div class="explain">Brancos e nulos são contabilizados entre os votos de quem compareceu. Abstenção é ausência, e não um tipo de voto.</div>
-  </div>
- </section>
- <section id="municipios" hidden aria-labelledby="mtitle">
-  <div class="panel"><div class="step">Resultados locais</div><h2 id="mtitle">Como votou cada município?</h2><p class="sub">Você poderá procurar uma cidade, escolher um candidato e conferir a votação do primeiro e do segundo turno.</p>
-  <div class="empty"><strong>Busca e tabela de municípios</strong><p>Os filtros e os resultados serão liberados após a preparação dos arquivos nacionais.</p></div>
-  <div class="def"><strong>Município em que um candidato ficou em primeiro</strong>É o município onde ele recebeu mais votos que qualquer outro candidato naquele turno.</div>
-  <div class="def"><strong>Porte eleitoral do município</strong>É o tamanho do município medido pela quantidade de votos válidos, e não pela população.</div>
-  </div>
- </section>
- <div class="panel"><h3>De onde virão os números?</h3><p>As análises serão preparadas a partir dos arquivos oficiais do Tribunal Superior Eleitoral (TSE), com indicação de data de atualização e metodologia de cálculo.</p><p><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Consultar a fonte: Dados Abertos do TSE</a></p><span class="pill">Projeto independente, não é um site oficial do TSE</span></div>
+<div class="notice" id="notice" role="status">Carregando a base de resultados...</div>
+<nav aria-label="Seções do observatório">
+<button type="button" data-tab="panorama" aria-selected="true">Quem recebeu mais votos?</button>
+<button type="button" data-tab="duelo" aria-selected="false">Comparar 1 × 1</button>
+<button type="button" data-tab="turnos" aria-selected="false">1º × 2º turno</button>
+<button type="button" data-tab="estados" aria-selected="false">Estados e exterior</button>
+<button type="button" data-tab="municipios" aria-selected="false">Municípios</button>
+<button type="button" data-tab="entenda" aria-selected="false">Entenda os números</button>
+</nav>
+<div class="filters">
+<label for="region">Qual local você quer analisar?
+<select id="region" disabled><option value="ALL">Brasil completo (inclui exterior)</option></select>
+</label>
+<label for="round">Qual turno?
+<select id="round" disabled><option value="1">Primeiro turno</option><option value="2">Segundo turno</option></select>
+</label>
+</div>
+<section id="panorama" class="page">
+<div class="panel"><h2>Quem recebeu mais votos?</h2><p class="sub">Cada barra mostra os votos de um candidato. A porcentagem é calculada apenas sobre os votos válidos do local e turno escolhidos.</p>
+<div class="stats" id="overviewStats"></div>
+<div id="ranking"></div>
+<div class="tip"><strong>Como entender uma porcentagem?</strong> Se aparecer 40%, isso significa 40 votos para o candidato em cada 100 votos válidos. Brancos, nulos e ausências não entram nessa conta.</div>
+</div>
+</section>
+<section id="duelo" class="page" hidden>
+<div class="panel"><h2>Compare dois candidatos (1 × 1)</h2><p class="sub">Escolha quaisquer dois candidatos do turno selecionado. Essa comparação não é uma previsão de resultado futuro.</p>
+<div class="grid2">
+<label class="field">Candidato A<select id="candA" disabled></select></label>
+<label class="field">Candidato B<select id="candB" disabled></select></label>
+</div>
+<div id="duelContent"></div>
+<div class="tip"><strong>Votos de diferença</strong> são votos a mais de um candidato. <strong>Pontos percentuais (p.p.)</strong> são a distância entre suas porcentagens considerando todos os votos válidos daquele turno.</div>
+</div>
+</section>
+<section id="turnos" class="page" hidden>
+<div class="panel"><h2>O que mudou do 1º para o 2º turno?</h2><p class="sub">Compare os votos realmente registrados para os dois finalistas, no mesmo território.</p><div id="roundContent"></div>
+<div class="tip">Um candidato ganhar votos entre turnos <strong>não prova</strong> que recebeu os votos dos outros candidatos. Não sabemos como cada eleitor votou individualmente.</div></div>
+</section>
+<section id="estados" class="page" hidden>
+<div class="panel"><h2>Onde cada candidato teve mais apoio?</h2><p class="sub">Escolha um candidato. As barras mostram quantos de cada 100 votos válidos foram para ele em cada estado e no exterior.</p>
+<label class="field">Candidato analisado<select id="territoryCand" disabled></select></label>
+<div id="stateList" class="spacer"></div>
+<div class="tip">Uma porcentagem alta em um estado pequeno pode representar menos votos que uma porcentagem menor em um estado grande. Por isso mostramos os dois números.</div></div>
+<div class="panel"><h3>Votação dos brasileiros no exterior</h3><div id="outsideContent"></div>
+<p class="small">As localidades com código ZZ são identificadas pelos nomes do cadastro eleitoral. Isso não equivale necessariamente a uma classificação por país.</p></div>
+</section>
+<section id="municipios" class="page" hidden>
+<div class="panel"><h2>Como votou cada município?</h2><p class="sub">Procure um município ou localidade no exterior e escolha um candidato para conferir seus votos.</p>
+<div class="filters">
+<label class="field">Candidato<select id="cityCand" disabled></select></label>
+<label class="field">Buscar município ou localidade<input id="citySearch" type="search" placeholder="Ex.: Campinas, Florianópolis, Lisboa" disabled></label>
+</div>
+<p id="cityCount" class="small"></p>
+<div class="tablewrap"><table><thead><tr><th>Local</th><th>Município/localidade</th><th class="num">Votos no candidato</th><th class="num">De cada 100 válidos</th><th class="num">Ficou em 1º?</th></tr></thead><tbody id="cityTable"></tbody></table></div>
+<p class="small">A tabela mostra até 100 registros por vez para facilitar a leitura. Use a busca para encontrar um local específico.</p>
+</div>
+<div class="panel"><h3>Desempenho por porte eleitoral</h3><p class="sub">Agrupamos os municípios pela quantidade de votos válidos, e não pela população. Localidades do exterior são analisadas separadamente.</p><div id="sizeChart"></div></div>
+</section>
+<section id="entenda" class="page" hidden>
+<div class="panel"><h2>O que cada número quer dizer?</h2>
+<div class="definition"><strong>Votos válidos</strong>São os votos computados para os candidatos. Nesta base, são os votos nominais válidos para presidente.</div>
+<div class="definition"><strong>Votos de diferença</strong>É uma subtração. Se A recebeu 120 mil votos e B recebeu 100 mil, A teve 20 mil votos a mais.</div>
+<div class="definition"><strong>Pontos percentuais (p.p.)</strong>Se A teve 45% e B teve 40%, a diferença é de 5 pontos percentuais. Não significa que A teve somente 5% mais votos.</div>
+<div class="definition"><strong>Mudança entre turnos</strong>Compara os votos ou as porcentagens do mesmo candidato no primeiro e no segundo turno. Não revela como cada pessoa votou.</div>
+<div class="definition"><strong>Abstenção</strong>Eleitores aptos que não compareceram. Não é um voto.</div>
+<div class="definition"><strong>Voto em branco</strong>O eleitor compareceu e escolheu votar em branco. Não é contabilizado para candidato.</div>
+<div class="definition"><strong>Voto nulo</strong>Voto registrado sem escolha válida de candidato. Também não é transferido para nenhum candidato.</div>
+<div class="tip"><strong>Por que ainda não mostramos números de brancos, nulos e abstenções?</strong> Porque a base de votação por candidato não contém essas informações. Vamos buscar os arquivos oficiais de comparecimento e apuração para incluí-las sem misturar fontes ou inventar valores.</div>
+</div>
+<div class="panel"><h3>Fonte e metodologia</h3><p id="sourceText">Aguardando dados.</p><p><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Acessar os dados abertos do TSE</a></p><p class="small">Este projeto é independente e não representa uma página oficial do TSE.</p></div>
+</section>
 </main>
-<footer>Observatório Eleitoral 2026 · Primeiro layout publicado sem números de demonstração. Os dados reais serão incluídos após validação.</footer>
+<footer>Observatório Eleitoral 2026 · Análise de dados públicos · Resultados sem recomendação ou preferência por candidatos.</footer>
 <script>
 (function(){
- const tabs=[...document.querySelectorAll('[data-tab]')];
- const sections=[...document.querySelectorAll('main section[id]')];
- tabs.forEach(btn=>btn.addEventListener('click',function(){
-  tabs.forEach(t=>t.setAttribute('aria-selected',String(t===btn)));
-  sections.forEach(s=>s.hidden=s.id!==btn.dataset.tab);
- }));
+"use strict";
+var DATA=null,REGION="ALL",ROUND="1";
+var UFNAME={AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins",ZZ:"Exterior"};
+var COLORS={"13":"#287eba","22":"#df9039","14":"#0a8865","70":"#9472be","55":"#c15f8b","30":"#668bb2"};
+var $=function(s){return document.querySelector(s);};
+var fmt=function(n){return Number(n||0).toLocaleString("pt-BR");};
+var pct=function(n){return (100*(Number.isFinite(n)?n:0)).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";};
+var pp=function(n){return (Math.abs(n)*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+" p.p.";};
+var signed=function(n){return(n>0?"+":n<0?"−":"")+fmt(Math.abs(n));};
+var safe=function(x){return String(x==null?"":x).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];});};
+var ccolor=function(num,i){return COLORS[num]||["#6f9d82","#9b92af","#9d8669","#7c95a8","#a5788a"][i%5];};
+var candidates=function(t){return(DATA.candidatos[t]||[]);};
+var cname=function(t,n){var c=candidates(t).find(function(x){return x.numero===n;});return c?c.nome:n;};
+var total=function(v){return Object.values(v||{}).reduce(function(a,b){return a+Number(b||0);},0);};
+var options=function(t){return candidates(t).map(function(c){return '<option value="'+safe(c.numero)+'">'+safe(c.nome)+" ("+safe(c.partido)+")</option>";}).join("");};
+var regionVotes=function(t,region){
+ if(region==="ALL")return DATA.nacional[t]||{};
+ if(region==="DOM"){
+  var out={};Object.keys(DATA.estados[t]||{}).forEach(function(uf){if(uf!=="ZZ"){Object.entries(DATA.estados[t][uf]).forEach(function(e){out[e[0]]=(out[e[0]]||0)+e[1];});}});
+  return out;
+ }
+ return(DATA.estados[t]||{})[region]||{};
+};
+var getRows=function(t,r){return DATA.municipios.filter(function(x){return String(x.turno)===t&&(r==="ALL"||(r==="DOM"?x.uf!=="ZZ":x.uf===r));});};
+var rank=function(v,t){return candidates(t).map(function(c){return {num:c.numero,name:c.nome,party:c.partido,v:Number(v[c.numero]||0)};}).sort(function(a,b){return b.v-a.v;});};
+var bars=function(entries,den,click){return entries.map(function(e,i){var width=den?100*e.v/den:0;return '<div class="bar-item"><div class="bar-top"><span>'+safe(e.name)+'</span><strong>'+pct(den?e.v/den:0)+'</strong></div><div class="track"><div class="barfill" style="width:'+width+'%;background:'+ccolor(e.num,i)+'"></div></div><div class="bar-detail">'+fmt(e.v)+' votos'+(e.party?" · "+safe(e.party):"")+'</div></div>';}).join("");};
+var summary=function(){
+ var v=regionVotes(ROUND,REGION),valid=total(v),r=rank(v,ROUND),top=r[0]||{name:"—",v:0};
+ $("#overviewStats").innerHTML='<div class="kpi"><small>Votos válidos</small><strong>'+fmt(valid)+'</strong></div><div class="kpi"><small>Mais votado neste local</small><strong>'+safe(top.name)+'</strong></div><div class="kpi"><small>Votos do mais votado</small><strong>'+pct(valid?top.v/valid:0)+'</strong></div>';
+ $("#ranking").innerHTML=bars(r,valid);
+};
+var duel=function(){
+ var v=regionVotes(ROUND,REGION),d=total(v),a=$("#candA").value,b=$("#candB").value;
+ if(a===b){$("#duelContent").innerHTML='<div class="tip">Escolha dois candidatos diferentes para comparar.</div>';return;}
+ var av=v[a]||0,bv=v[b]||0,diff=av-bv,nameA=cname(ROUND,a),nameB=cname(ROUND,b);
+ var pair=av+bv;
+ $("#duelContent").innerHTML='<div class="grid2"><div class="statbox"><small>'+safe(nameA)+'</small><strong>'+fmt(av)+'</strong><small>'+pct(d?av/d:0)+' dos válidos</small></div><div class="statbox"><small>'+safe(nameB)+'</small><strong>'+fmt(bv)+'</strong><small>'+pct(d?bv/d:0)+' dos válidos</small></div></div>'+
+ '<div class="pairbar"><span style="width:'+(pair?100*av/pair:0)+'%;background:'+ccolor(a,0)+'"></span><span style="width:'+(pair?100*bv/pair:0)+'%;background:'+ccolor(b,1)+'"></span></div>'+
+ '<p class="small">A barra acima compara apenas os votos desses dois candidatos. Os percentuais nos cartões consideram <strong>todos os votos válidos</strong>.</p>'+
+ '<div class="row"><span>Diferença em votos</span><strong>'+fmt(Math.abs(diff))+' votos</strong></div>'+
+ '<div class="row"><span>Diferença nas porcentagens</span><strong>'+pp(d?diff/d:0)+'</strong></div>'+
+ '<div class="tip">'+(diff===0?"Os dois candidatos empataram.":safe(diff>0?nameA:nameB)+" recebeu <strong>"+fmt(Math.abs(diff))+"</strong> votos a mais que "+safe(diff>0?nameB:nameA)+".")+'</div>';
+};
+var roundCompare=function(){
+ var a=regionVotes("1",REGION),b=regionVotes("2",REGION),v1=total(a),v2=total(b);
+ var nums=["13","22"];
+ var parts=nums.map(function(n,i){
+  var vA=a[n]||0,vB=b[n]||0,delta=vB-vA,dpp=(v2?vB/v2:0)-(v1?vA/v1:0);
+  return '<div class="panel"><h3>'+safe(cname("1",n))+'</h3>'+
+   '<div class="row"><span>1º turno</span><strong>'+fmt(vA)+' votos · '+pct(v1?vA/v1:0)+'</strong></div>'+
+   '<div class="row"><span>2º turno</span><strong>'+fmt(vB)+' votos · '+pct(v2?vB/v2:0)+'</strong></div>'+
+   '<div class="row"><span>Mudança de votos</span><strong>'+signed(delta)+'</strong></div>'+
+   '<div class="row"><span>Mudança na participação</span><strong>'+(dpp<0?"−":dpp>0?"+":"")+pp(dpp)+'</strong></div>'+
+   '<div class="tip">Entre os turnos, a quantidade de votos '+(delta>0?"aumentou":delta<0?"diminuiu":"não mudou")+' '+fmt(Math.abs(delta))+'. A participação nos votos válidos '+(dpp>0?"subiu":dpp<0?"caiu":"não mudou")+'.</div></div>';
+ }).join("");
+ var diff1=(a["13"]||0)-(a["22"]||0),diff2=(b["13"]||0)-(b["22"]||0);
+ var other=v1-(a["13"]||0)-(a["22"]||0);
+ $("#roundContent").innerHTML='<div class="cols">'+parts+'</div>'+
+ '<div class="panel"><h3>Como os votos válidos se dividiram?</h3>'+
+ '<p class="small">1º turno · Lula, Flávio e demais candidatos</p><div class="pairbar"><span style="width:'+(v1?100*a["13"]/v1:0)+'%;background:#287eba"></span><span style="width:'+(v1?100*a["22"]/v1:0)+'%;background:#df9039"></span><span style="width:'+(v1?100*other/v1:0)+'%;background:#8b9c95"></span></div>'+
+ '<p class="small">2º turno · Lula e Flávio</p><div class="pairbar"><span style="width:'+(v2?100*b["13"]/v2:0)+'%;background:#287eba"></span><span style="width:'+(v2?100*b["22"]/v2:0)+'%;background:#df9039"></span></div>'+
+ '<div class="row"><span>Saldo Lula menos Flávio · 1º turno</span><strong>'+signed(diff1)+' votos</strong></div>'+
+ '<div class="row"><span>Saldo Lula menos Flávio · 2º turno</span><strong>'+signed(diff2)+' votos</strong></div>'+
+ '<div class="row"><span>Quanto o saldo mudou</span><strong>'+signed(diff2-diff1)+' votos</strong></div>'+
+ '<div class="tip">“Saldo” é a diferença entre os votos de Lula e Flávio. Quando o saldo muda entre turnos, isso indica uma mudança na distância entre os candidatos, e não uma contagem de pessoas que trocaram de voto.</div></div>';
+};
+var states=function(){
+ var t=ROUND,n=$("#territoryCand").value,all=Object.keys(DATA.estados[t]||{}).map(function(uf){var v=DATA.estados[t][uf],den=total(v);return{uf:uf,v:v[n]||0,den:den,p:den?(v[n]||0)/den:0};}).sort(function(a,b){return b.p-a.p;});
+ $("#stateList").innerHTML=all.map(function(x,i){return '<div class="statebar"><button data-uf="'+safe(x.uf)+'" title="Filtrar por '+safe(UFNAME[x.uf]||x.uf)+'">'+safe(x.uf)+'</button><div><div class="bar-top"><span>'+safe(UFNAME[x.uf]||x.uf)+'</span><strong>'+pct(x.p)+'</strong></div><div class="track"><div class="barfill" style="width:'+(x.p*100)+'%;background:'+ccolor(n,0)+'"></div></div></div><strong>'+fmt(x.v)+' votos</strong></div>';}).join("");
+ document.querySelectorAll("[data-uf]").forEach(function(el){el.addEventListener("click",function(){REGION=this.dataset.uf;$("#region").value=REGION;render();});});
+ var ext=regionVotes(t,"ZZ"),num=total(ext),r=rank(ext,t);
+ $("#outsideContent").innerHTML='<div class="kpi"><small>Votos válidos no exterior · '+t+'º turno</small><strong>'+fmt(num)+'</strong></div>'+bars(r,num);
+};
+var city=function(){
+ var t=ROUND,n=$("#cityCand").value,query=normalize($("#citySearch").value),data=getRows(t,REGION);
+ var matching=data.filter(function(x){return !query||normalize(x.municipio+" "+x.uf).includes(query);});
+ matching.sort(function(a,b){return(b.votos[n]||0)-(a.votos[n]||0);});
+ $("#cityCount").textContent="Encontrados: "+fmt(matching.length)+" locais. Mostrando até 100 na tabela.";
+ $("#cityTable").innerHTML=matching.slice(0,100).map(function(x){
+  var votes=x.votos[n]||0,top=Math.max.apply(null,Object.values(x.votos)),yes=votes===top&&top>0;
+  return '<tr><td>'+safe(x.uf)+'</td><td>'+safe(x.municipio)+'</td><td class="num">'+fmt(votes)+'</td><td class="num">'+pct(x.validos?votes/x.validos:0)+'</td><td class="num">'+(yes?"Sim":"Não")+'</td></tr>';
+ }).join("")||'<tr><td colspan="5">Nenhuma localidade encontrada.</td></tr>';
+ var bins=[["Até 5 mil",0,5000],["5 a 20 mil",5001,20000],["20 a 100 mil",20001,100000],["100 a 500 mil",100001,500000],["Acima de 500 mil",500001,Infinity]];
+ var m=data.filter(function(x){return x.uf!=="ZZ";});
+ $("#sizeChart").innerHTML=bins.map(function(bin){var list=m.filter(function(x){return x.validos>=bin[1]&&x.validos<=bin[2];}),val=list.reduce(function(a,x){return a+x.validos;},0),num=list.reduce(function(a,x){return a+(x.votos[n]||0);},0);return '<div class="bar-item"><div class="bar-top"><span>'+bin[0]+'</span><strong>'+(val?pct(num/val):"Sem dados")+'</strong></div><div class="track"><div class="barfill" style="width:'+(val?100*num/val:0)+'%;background:'+ccolor(n,0)+'"></div></div><div class="bar-detail">'+fmt(list.length)+' municípios · '+fmt(num)+' votos do candidato</div></div>';}).join("");
+};
+function normalize(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
+function render(){if(!DATA)return;summary();duel();roundCompare();states();city();}
+function refill(t){
+ var sels=["#candA","#candB","#territoryCand","#cityCand"];
+ sels.forEach(function(sel){var el=$(sel),old=el.value;el.innerHTML=options(t);if(candidates(t).some(function(c){return c.numero===old;}))el.value=old;});
+ if($("#candA").value===$("#candB").value){var names=candidates(t);if(names.length>1)$("#candB").value=names[1].numero;}
+}
+document.querySelectorAll("nav [data-tab]").forEach(function(btn){btn.addEventListener("click",function(){
+ document.querySelectorAll("nav [data-tab]").forEach(function(el){el.setAttribute("aria-selected",String(el===btn));});
+ document.querySelectorAll("section.page").forEach(function(el){el.hidden=el.id!==btn.dataset.tab;});
+ });});
+$("#region").addEventListener("change",function(){REGION=this.value;render();});
+$("#round").addEventListener("change",function(){ROUND=this.value;refill(ROUND);render();});
+["#candA","#candB","#territoryCand","#cityCand"].forEach(function(id){$(id).addEventListener("change",render);});
+$("#citySearch").addEventListener("input",city);
+fetch("./dados_eleicao_2026.json",{cache:"no-store"}).then(function(res){if(!res.ok)throw Error("arquivo de dados ainda não publicado (HTTP "+res.status+")");return res.json();}).then(function(d){
+ if(!d.candidatos||!d.nacional||!d.estados||!Array.isArray(d.municipios))throw Error("estrutura JSON incompleta");
+ ["1","2"].forEach(function(t){var n=total(d.nacional[t]);if(n!==Number(d.totais_conferidos[t]))throw Error("total não confere no turno "+t);});
+ DATA=d;var region=$("#region");region.innerHTML='<option value="ALL">Brasil completo (inclui exterior)</option><option value="DOM">Brasil sem exterior (27 UFs)</option><option value="ZZ">Exterior (ZZ)</option>'+Object.keys(d.estados["1"]||{}).filter(function(u){return u!=="ZZ";}).sort().map(function(uf){return'<option value="'+safe(uf)+'">'+safe(UFNAME[uf]||uf)+" ("+uf+")</option>";}).join("");
+ ["#region","#round","#candA","#candB","#territoryCand","#cityCand","#citySearch"].forEach(function(sel){$(sel).disabled=false;});
+ refill("1");$("#candA").value="13";$("#candB").value="22";$("#territoryCand").value="13";$("#cityCand").value="13";
+ $("#notice").innerHTML="<strong>Dados carregados.</strong> Votação presidencial dos dois turnos de 2026, incluindo o exterior. Brancos, nulos e abstenções ainda não estão disponíveis nesta base.";
+ $("#verification").textContent="VOTOS VÁLIDOS · DADOS DO TSE · 1º E 2º TURNOS";
+ $("#sourceText").textContent="Fonte: "+(d.fonte||"TSE")+". Gerado em: "+(d.gerado_em_utc||"data não informada")+". Totais conferidos: primeiro turno "+fmt(d.totais_conferidos["1"])+" e segundo turno "+fmt(d.totais_conferidos["2"])+". O exterior aparece como ZZ. Esta base não contém votos brancos, nulos nem abstenção.";
+ render();
+}).catch(function(err){
+ $("#notice").innerHTML='<strong>Os gráficos estão prontos, mas o arquivo de dados ainda não foi disponibilizado no GitHub.</strong> Publique <code>dados_eleicao_2026.json</code> na pasta principal do repositório. Detalhe: '+safe(err.message);
+ $("#verification").textContent="AGUARDANDO PUBLICAÇÃO DOS DADOS";
+});
 })();
 </script>
 </body>
