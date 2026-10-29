@@ -3,8 +3,8 @@
    Uma correlação geográfica não identifica o comportamento de cada eleitor. */
 (function (global) {
  "use strict";
- var state = {candidate:"70",rendered:false};
- var names = {},UF = {},data = null,part = null,region = "ALL";
+ var state = {candidate:"70",rendered:false,questionSearch:""};
+ var data = null,part = null,region = "ALL",city = null;
  var labels = {AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins",ZZ:"Exterior"};
  function n(x){return Number(x)||0;}
  function fmt(x){return n(x).toLocaleString("pt-BR");}
@@ -27,6 +27,9 @@
   if(r==="ZZ")return e;
   return (part.estados[t]||{})[r]||{};
  }
+ function scopeVotes(t){return city?(t==="1"?city.primeiro.votos:city.segundo.votos):votes(t,region);}
+ function scopeParticipation(t){return city?(t==="1"?city.participacao1:city.participacao2):participation(t,region);}
+ function scopeLabel(){return city?city.nome+" ("+city.uf+")":territoryLabel(region);}
  function sum(v){return Object.keys(v||{}).reduce(function(s,k){return s+n(v[k]);},0);}
  function margin(v){return n(v["13"])-n(v["22"]);}
  function winner(m){return m>0?"Lula":m<0?"Flávio":"Empate";}
@@ -35,7 +38,7 @@
  function buildMunicipalities(){
   var a={},b={};
   data.municipios.forEach(function(x){var key=x.uf+"|"+x.codigo;if(x.turno===1)a[key]=x;else b[key]=x;});
-  return Object.keys(a).filter(function(k){return !!b[k]&&matches(a[k].uf,region);}).map(function(k){
+  return Object.keys(a).filter(function(k){return !!b[k]&&matches(a[k].uf,city?city.uf:region);}).map(function(k){
    var x=a[k],y=b[k],m1=margin(x.votos),m2=margin(y.votos);
    return {uf:x.uf,name:x.municipio,key:k,m1:m1,m2:m2,delta:m2-m1,one:x,two:y};
   });
@@ -50,29 +53,31 @@
  }
  function card(id,num,question,short,content,terms,opened){
   var lookup=normal(question+" "+short+" "+terms);
-  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+id+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+question+'</strong><small>'+short+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'</div></details></article>';
+  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button></div></details></article>';
  }
+
  function make(){
-  var v1=votes("1",region),v2=votes("2",region),p1=participation("1",region),p2=participation("2",region);
+  var v1=scopeVotes("1"),v2=scopeVotes("2"),p1=scopeParticipation("1"),p2=scopeParticipation("2");
   var s1=margin(v1),s2=margin(v2),swing=s2-s1,l1=n(v1["13"]),l2=n(v2["13"]),f1=n(v1["22"]),f2=n(v2["22"]);
   var dL=l2-l1,dF=f2-f1,total1=sum(v1),total2=sum(v2),locals=buildMunicipalities();
   var toLula=locals.filter(function(x){return x.m1<0&&x.m2>0;});
   var toFlavio=locals.filter(function(x){return x.m1>0&&x.m2<0;});
   var tie=locals.filter(function(x){return x.m1===0||x.m2===0;});
-  var localName=territoryLabel(region);
+  var localName=scopeLabel(),geography=city?city.uf:region;
   var aa={};
   var previously=document.querySelectorAll("#qaAnswers details[open]");
   for(var j=0;j<previously.length;j++)aa[previously[j].getAttribute("data-qa-id")]=true;
+  var deepLink=global.location?new URL(global.location.href).searchParams.get("pergunta"):null;
   var first=!state.rendered;
   var cards=[];
-  var intro1=(s1<0&&s2>0?"Aqui houve uma virada entre os dois candidatos.":s1>0&&s2<0?"Aqui a liderança mudou de Lula para Flávio.":"Aqui não houve troca de liderança entre os dois candidatos.");
+  var intro1=(s1<0&&s2>0?"Aqui houve uma virada entre os dois candidatos.":s1>0&&s2<0?"Aqui a liderança mudou de Lula para Flávio.":s1===0||s2===0?"Houve um empate entre Lula e Flávio em pelo menos um turno.":"Aqui não houve troca de liderança entre os dois candidatos.");
   var q1= '<p class="qa-lead">'+safe(intro1)+' No primeiro turno: <strong>'+safe(howFar(s1))+'</strong>. No segundo: <strong>'+safe(howFar(s2))+'</strong>.</p>'+
    stats([stat("Votos a mais para Lula",sign(dL),"Do 1º para o 2º turno"),stat("Votos a mais para Flávio",sign(dF),"Do 1º para o 2º turno"),stat("Mudança na diferença",sign(swing),"A favor de Lula quando positiva")])+
    '<p>A diferença na quantidade de votos recebidos por cada candidato é o que explica <strong>matematicamente</strong> a mudança do resultado. Não precisamos supor a intenção dos eleitores para fazer essa conta.</p>'+
    note("Por que uma pessoa escolheu determinado candidato, se mudou seu voto ou se foi influenciada por uma campanha.")+
    method("Conta utilizada: votos de Lula menos votos de Flávio em cada turno. A comparação é sempre dos mesmos candidatos.");
-  cards.push(card("virada","01","Como Lula passou Flávio no segundo turno?",
-     safe(region==="ALL"?"Flávio liderou o primeiro turno; Lula teve mais votos no segundo. Veja como a diferença mudou.":intro1),q1,"virou virada diferença 1º segundo resultado lula flavio",aa.virada||first));
+  cards.push(card("virada","01",city?"Como a disputa mudou em "+city.nome+"?":region==="ALL"?"Como Lula passou Flávio no segundo turno?":"Como a disputa mudou neste território?",
+     intro1,q1,"virou virada diferença primeiro segundo resultado lula flavio",aa.virada||first||deepLink==="virada"));
   var domL=region==="ALL"?toLula.filter(function(x){return x.uf!=="ZZ";}).length:null;
   var domF=region==="ALL"?toFlavio.filter(function(x){return x.uf!=="ZZ";}).length:null;
   var q2='<p class="qa-lead">Em '+safe(localName)+', <strong>'+fmt(toLula.length)+'</strong> localidades passaram da liderança de Flávio para a de Lula, e <strong>'+fmt(toFlavio.length)+'</strong> fizeram o caminho inverso.</p>'+
