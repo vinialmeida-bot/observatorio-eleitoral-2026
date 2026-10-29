@@ -210,6 +210,7 @@ var rank=function(v,t){return candidates(t).map(function(c){return {num:c.numero
 var bars=function(entries,den,click){return entries.map(function(e,i){var width=den?100*e.v/den:0;return '<div class="bar-item"><div class="bar-top"><span>'+safe(e.name)+'</span><strong>'+pct(den?e.v/den:0)+'</strong></div><div class="track"><div class="barfill" style="width:'+width+'%;background:'+ccolor(e.num,i)+'"></div></div><div class="bar-detail">'+fmt(e.v)+' votos'+(e.party?" · "+safe(e.party):"")+'</div></div>';}).join("");};
 var summary=function(){
  var v=regionVotes(ROUND,REGION),valid=total(v),r=rank(v,ROUND),top=r[0]||{name:"—",v:0};
+ $("#overviewExplanation").innerHTML=valid?"<strong>Em palavras simples:</strong> "+safe(top.name)+" foi o mais votado neste território e turno. Aproximadamente "+Math.round(100*top.v/valid)+" de cada 100 votos válidos foram para esse candidato.":"Sem votos válidos neste filtro.";
  $("#overviewStats").innerHTML='<div class="kpi"><small>Votos válidos</small><strong>'+fmt(valid)+'</strong></div><div class="kpi"><small>Mais votado neste local</small><strong>'+safe(top.name)+'</strong></div><div class="kpi"><small>Votos do mais votado</small><strong>'+pct(valid?top.v/valid:0)+'</strong></div>';
  $("#ranking").innerHTML=bars(r,valid);
 };
@@ -282,6 +283,7 @@ var participation=function(){
  if(!PART)return;
  var x=pLocal(ROUND,REGION);if(!x)return;
  var apt=x.aptos||0,compare=x.comparecimento||0;
+ $("#participationExplanation").innerHTML=apt?"<strong>Em palavras simples:</strong> de cada 100 pessoas aptas, aproximadamente "+Math.round(100*compare/apt)+" foram votar e "+Math.round(100*x.abstencoes/apt)+" não foram.":"Sem eleitores aptos neste filtro.";
  var kpis=[["Eleitores aptos",fmt(apt)],["Comparecimento",fmt(compare)+" · "+pct(apt?compare/apt:0)],["Abstenções",fmt(x.abstencoes)+" · "+pct(pRate(x))],["Brancos",fmt(x.brancos)+" · "+pct(compare?x.brancos/compare:0)],["Nulos",fmt(x.nulos)+" · "+pct(compare?x.nulos/compare:0)],["Votos válidos",fmt(x.validos)+" · "+pct(compare?x.validos/compare:0)]];
  $("#participationStats").innerHTML=kpis.map(function(k){return '<div class="kpi"><small>'+k[0]+'</small><strong>'+k[1]+'</strong></div>';}).join("");
  $("#participationBars").innerHTML='<h3>Participação entre eleitores aptos</h3><div class="pairbar"><span style="width:'+(apt?100*compare/apt:0)+'%;background:#087653"></span><span style="width:'+(apt?100*x.abstencoes/apt:0)+'%;background:#df9039"></span></div>'+pLine("Compareceram",compare,apt)+pLine("Abstenções",x.abstencoes,apt);
@@ -309,7 +311,7 @@ var participationCity=function(){
  $("#participationCities").innerHTML=rows.slice(0,100).map(function(x){return '<tr><td>'+safe(x.uf)+'</td><td>'+safe(x.name)+'</td><td class="num">'+fmt(x.aptos)+'</td><td class="num">'+fmt(x.comparecimento)+'</td><td class="num">'+fmt(x.abstencoes)+'</td><td class="num">'+pct(pRate(x))+'</td><td class="num">'+fmt(x.brancos)+'</td><td class="num">'+fmt(x.nulos)+'</td></tr>';}).join("")||'<tr><td colspan="8">Nenhuma localidade encontrada.</td></tr>';
 };
 function normalize(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
-function render(){if(!DATA)return;summary();duel();roundCompare();states();city();participation();}
+function render(){if(!DATA)return;summary();duel();roundCompare();states();city();participation();if(PART&&window.ObsPerguntas)window.ObsPerguntas.render({votos:DATA,participacao:PART,regiao:REGION});}
 function refill(t){
  var sels=["#candA","#candB","#territoryCand","#cityCand"];
  sels.forEach(function(sel){var el=$(sel),old=el.value;el.innerHTML=options(t);if(candidates(t).some(function(c){return c.numero===old;}))el.value=old;});
@@ -342,7 +344,7 @@ Promise.all(["./dados_eleicao_2026.json","./dados_participacao_2026.json"].map(f
  var region=$("#region");region.innerHTML='<option value="ALL">Brasil completo (inclui exterior)</option><option value="DOM">Brasil sem exterior (27 UFs)</option><option value="ZZ">Exterior (ZZ)</option>'+Object.keys(d.estados["1"]||{}).filter(function(u){return u!=="ZZ";}).sort().map(function(uf){return'<option value="'+safe(uf)+'">'+safe(UFNAME[uf]||uf)+" ("+uf+")</option>";}).join("");
  ["#region","#round","#candA","#candB","#territoryCand","#cityCand","#citySearch"].forEach(function(sel){$(sel).disabled=false;});
  refill("1");$("#candA").value="13";$("#candB").value="22";$("#territoryCand").value="13";$("#cityCand").value="13";
- $("#notice").innerHTML="<strong>Dados carregados e conferidos.</strong> Votação presidencial, comparecimento, abstenções, brancos e nulos dos dois turnos, incluindo o exterior.";
+ $("#notice").innerHTML="<strong>Dados carregados.</strong> Comece pelas perguntas respondidas ou escolha o lugar que deseja conhecer. Todos os números são do TSE.";
  $("#verification").textContent="DADOS DO TSE · VOTOS E PARTICIPAÇÃO · 1º E 2º TURNOS";
  $("#sourceText").textContent="Fontes: "+(d.fonte||"TSE")+" e "+p.fonte+". Totais de votos válidos conferidos: 1º turno "+fmt(d.totais_conferidos["1"])+", 2º turno "+fmt(d.totais_conferidos["2"])+". Exterior: ZZ. Abstenção usa aptos; brancos e nulos usam comparecimento. Diferença técnica de 423 eleitores entre aptos e comparecimento + abstenções em cada turno na base nacional. SHA-256 do arquivo original: "+p.sha256_zip+".";
  render();
