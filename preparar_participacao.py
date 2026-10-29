@@ -5,7 +5,7 @@ Fonte oficial TSE: detalhe_votacao_munzona_2026.zip
 Nao exige bibliotecas externas. Nao publica dados sem reconciliacao.
 
 Uso no PowerShell:
-    python .\preparar_participacao.py
+    python preparar_participacao.py
 
 Arquivos esperados na mesma pasta:
     dados_eleicao_2026.json (gerado anteriormente)
@@ -84,14 +84,15 @@ def baixar():
 
 def membro_principal(z):
     csvs = [p for p in z.namelist() if p.lower().endswith(".csv")]
-    brasil = [p for p in csvs if Path(p).name.lower() in {
-        "detalhe_votacao_munzona_2026_br.csv",
-        "detalhe_votacao_munzona_2026_brasil.csv"}]
+    # BRASIL e o consolidado nacional; BR e outro arquivo e nao deve
+    # ser somado nem escolhido no lugar do BRASIL.
+    brasil = [p for p in csvs if Path(p).name.lower() ==
+              "detalhe_votacao_munzona_2026_brasil.csv"]
     if len(brasil) == 1:
         return brasil[0]
     if len(csvs) == 1:
         return csvs[0]
-    raise ValueError("Nao foi possivel escolher um CSV nacional sem risco de duplicar UFs: " + str(csvs[:20]))
+    raise ValueError("CSV BRASIL nao encontrado de forma inequivoca: " + str(csvs[:20]))
 
 
 def executar():
