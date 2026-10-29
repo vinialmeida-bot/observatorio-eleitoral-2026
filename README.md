@@ -16,7 +16,7 @@ O Observatório é um projeto independente, gratuito e aberto para explicar a el
 
 A busca de perguntas serve para **filtrar as dez perguntas publicadas**, não funciona como chatbot e não produz respostas novas a qualquer pergunta. A busca de cidades usa dados carregados localmente no navegador: o site não solicita cadastro, nome do eleitor, endereço ou preferências políticas.
 
-Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada`: esses parâmetros indicam somente uma localidade pública e uma pergunta publicada, nunca informações pessoais.
+Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada` ou `?regiao=SC&pergunta=virada`: esses parâmetros indicam somente uma localidade/UF pública e uma pergunta publicada, nunca informações pessoais.
 
 **Importante:** selecionar uma cidade adapta o resumo e as perguntas da página inicial; os painéis mais técnicos continuam usando o filtro geral de Brasil/UF indicado no topo.
 
@@ -52,6 +52,7 @@ Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada`: esses pa
 | `dados_participacao_2026.json` | Aptos, comparecimento, abstenção, brancos, nulos e válidos |
 | `preparar_dados.py` | Gera a base de candidatos a partir do CSV nacional do TSE |
 | `preparar_participacao.py` | Gera a base de participação a partir do ZIP nacional do TSE e reconcilia votos válidos |
+| `verificar_projeto.py` | Reconfere votos válidos, totais por localidades/estados, nulos, comparecimento e viradas municipais |
 
 As bases JSON são arquivos estáticos; **a página não depende de APIs externas para fazer contas e responder às perguntas**. Links com `?municipio=` e `?pergunta=` permitem abrir um assunto diretamente sem salvar dados do visitante.
 
@@ -83,7 +84,7 @@ python -m http.server 8000
 
 Visite http://localhost:8000 no navegador. Abrir o HTML como `file://` pode bloquear o carregamento dos JSONs em alguns navegadores.
 
-Para recalcular os dados oficiais, leia as instruções no início de cada arquivo `preparar_*.py`.
+Para verificar os dados sem alterá-los, execute `python verificar_projeto.py` na pasta com os arquivos JSON. O script informa divergências e resume as mudanças de liderança entre Lula e Flávio. Para recalcular os arquivos oficiais, leia as instruções no início de cada `preparar_*.py`.
 
 ## Independência
 
