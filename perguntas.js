@@ -78,24 +78,47 @@
    method("Conta utilizada: votos de Lula menos votos de Flávio em cada turno. A comparação é sempre dos mesmos candidatos.");
   cards.push(card("virada","01",city?"Como a disputa mudou em "+city.nome+"?":region==="ALL"?"Como Lula passou Flávio no segundo turno?":"Como a disputa mudou neste território?",
      intro1,q1,"virou virada diferença primeiro segundo resultado lula flavio",aa.virada||first||deepLink==="virada"));
-  var domL=region==="ALL"?toLula.filter(function(x){return x.uf!=="ZZ";}).length:null;
-  var domF=region==="ALL"?toFlavio.filter(function(x){return x.uf!=="ZZ";}).length:null;
-  var q2='<p class="qa-lead">Em '+safe(localName)+', <strong>'+fmt(toLula.length)+'</strong> localidades passaram da liderança de Flávio para a de Lula, e <strong>'+fmt(toFlavio.length)+'</strong> fizeram o caminho inverso.</p>'+
-   (region==="ALL"?'<p>Considerando somente municípios brasileiros, foram <strong>'+fmt(domL)+'</strong> viradas para Lula e <strong>'+fmt(domF)+'</strong> para Flávio. O restante corresponde a localidades do exterior.</p>':'')+
-   stats([stat("Passaram para Lula",fmt(toLula.length),"Liderança entre os dois candidatos"),stat("Passaram para Flávio",fmt(toFlavio.length),"Liderança entre os dois candidatos"),stat("Com empate em algum turno",fmt(tie.length),"Não entram na contagem de viradas")])+
-   '<p>Uma cidade pode ter dado mais votos a Lula ou Flávio sem necessariamente mudar o candidato que ficou à frente. Contamos como virada somente a troca efetiva da liderança.</p>'+
-   method("Unidade: município ou localidade exterior. Critério: comparar os votos de Lula e Flávio em cada turno; empates não contam como virada.");
-  cards.push(card("municipios","02","Quantas cidades mudaram de lado?",
-    fmt(toLula.length)+" passaram a ter Lula à frente; "+fmt(toFlavio.length)+" passaram a ter Flávio à frente.",q2,"cidades municipios viradas mudança de lado liderança",aa.municipios));
+  var domL=region==="ALL"&&!city?toLula.filter(function(x){return x.uf!=="ZZ";}).length:null;
+  var domF=region==="ALL"&&!city?toFlavio.filter(function(x){return x.uf!=="ZZ";}).length:null;
+  var own=city?locals.find(function(x){return x.key===city.key;}):null;
+  var ownFlip=own?(own.m1<0&&own.m2>0?"Flávio estava à frente no primeiro turno; Lula ficou à frente no segundo.":own.m1>0&&own.m2<0?"Lula estava à frente no primeiro turno; Flávio ficou à frente no segundo.":own.m1===0||own.m2===0?"Houve empate entre Lula e Flávio em pelo menos um turno.":"Não houve troca de liderança entre Lula e Flávio."):null;
+  var q2=city?'<p class="qa-lead">'+safe(ownFlip)+'</p>'+
+   stats([stat("Primeiro turno",howFar(own.m1)),stat("Segundo turno",howFar(own.m2)),stat("Viradas no estado",fmt(toLula.length+toFlavio.length),"Troca de liderança, sem empates")])+
+   '<p>Outras cidades do estado de '+safe(labels[city.uf]||city.uf)+' podem ter tido resultados diferentes. Aqui contamos como virada apenas quando muda quem está à frente entre Lula e Flávio.</p>'+
+   method("Comparamos os dois candidatos em ambos os turnos; empate não é contado como virada."):
+   '<p class="qa-lead">Em '+safe(localName)+', <strong>'+fmt(toLula.length)+'</strong> localidades passaram da liderança de Flávio para Lula, e <strong>'+fmt(toFlavio.length)+'</strong> fizeram o caminho inverso.</p>'+
+   (region==="ALL"?'<p>Considerando só municípios brasileiros, foram <strong>'+fmt(domL)+'</strong> viradas para Lula e <strong>'+fmt(domF)+'</strong> para Flávio. O restante corresponde a localidades do exterior.</p>':'')+
+   stats([stat("Passaram para Lula",fmt(toLula.length),"Liderança entre os dois candidatos"),stat("Passaram para Flávio",fmt(toFlavio.length),"Liderança entre os dois candidatos"),stat("Empate em algum turno",fmt(tie.length),"Não entram na contagem de viradas")])+
+   '<p>Uma cidade pode ter dado mais votos a Lula ou Flávio sem necessariamente mudar quem ficou à frente. Só contamos trocas efetivas de liderança.</p>'+
+   method("Unidade: município ou localidade exterior. Critério: liderança de Lula versus Flávio em cada turno, excluindo empates.");
+  cards.push(card("municipios","02",city?"Minha cidade teve uma virada?":"Quantas cidades mudaram de lado?",
+   city?ownFlip:fmt(toLula.length)+" passaram a ter Lula à frente; "+fmt(toFlavio.length)+" passaram a ter Flávio à frente.",
+   q2,"cidades municipios viradas mudança de lado liderança",aa.municipios||deepLink==="municipios"));
   var sortedFlip=toLula.slice().sort(function(a,b){return b.delta-a.delta;}).slice(0,5);
+  var sortedReverse=toFlavio.slice().sort(function(a,b){return a.delta-b.delta;}).slice(0,5);
   var largest=locals.slice().sort(function(a,b){return b.delta-a.delta;}).slice(0,5);
-  var q3='<p class="qa-lead">Entre as localidades em que houve virada para Lula, estas tiveram as maiores mudanças na <strong>diferença de votos</strong>:</p>'+
+  var pps=function(x){var a=sum(x.one.votos),b=sum(x.two.votos);return(b?x.m2/b:0)-(a?x.m1/a:0);};
+  var q3,short3;
+  if(city){
+   var absRank=locals.slice().sort(function(a,b){return Math.abs(b.delta)-Math.abs(a.delta);}).findIndex(function(x){return x.key===city.key;})+1;
+   var ppRank=locals.slice().sort(function(a,b){return Math.abs(pps(b))-Math.abs(pps(a));}).findIndex(function(x){return x.key===city.key;})+1;
+   short3="Sua cidade ficou na posição "+fmt(absRank)+" entre "+fmt(locals.length)+" localidades do estado em mudança absoluta da diferença de votos.";
+   q3='<p class="qa-lead">Em '+safe(city.nome)+', a diferença Lula menos Flávio mudou '+(own.delta>=0?"a favor de Lula":"a favor de Flávio")+' em <strong>'+fmt(Math.abs(own.delta))+' votos</strong>.</p>'+
+    stats([stat("Posição por votos",fmt(absRank)+"ª de "+fmt(locals.length),"Mudança absoluta da diferença"),stat("Posição proporcional",fmt(ppRank)+"ª de "+fmt(locals.length),"Mudança em pontos percentuais"),stat("Variação proporcional",((pps(own)>0?"+":pps(own)<0?"−":"")+points(pps(own))),"Lula menos Flávio, entre os turnos")])+
+    '<p>A classificação por votos tende a destacar cidades maiores. A posição proporcional considera a diferença entre os candidatos em relação ao total de votos válidos de cada turno.</p>'+
+    method("Ranking entre municípios/localidades do mesmo estado, pela magnitude da mudança (independentemente do sentido). Percentual: (saldo Lula−Flávio ÷ válidos do 2º turno) menos (saldo ÷ válidos do 1º turno).");
+  }else{
+   short3=sortedFlip.length?sortedFlip[0].name+" ("+sortedFlip[0].uf+") aparece entre as maiores mudanças em votos.":"Não houve virada de Flávio para Lula neste filtro.";
+   q3='<p class="qa-lead">Estas foram as maiores mudanças em votos, entre localidades que passaram da liderança de Flávio para Lula:</p>'+
     list(sortedFlip,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Antes, Flávio tinha '+fmt(-x.m1)+' votos de vantagem. Depois, Lula ficou '+fmt(x.m2)+' à frente.</span></li>';})+
-    '<h3>Onde a diferença mais mudou, mesmo sem trocar a liderança?</h3>'+
+    '<h3>E onde Lula estava à frente e Flávio passou à frente?</h3>'+
+    list(sortedReverse,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Antes, Lula tinha '+fmt(x.m1)+' votos de vantagem. Depois, Flávio ficou '+fmt(-x.m2)+' à frente.</span></li>';})+
+    '<h3>Maiores mudanças na diferença, com ou sem virada</h3>'+
     list(largest,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>A diferença entre Lula e Flávio mudou '+fmt(x.delta)+' votos a favor de Lula.</span></li>';})+
-    method("Ranking por variação em votos absolutos. Isso favorece municípios grandes; não equivale a uma classificação por crescimento percentual.");
-  cards.push(card("onde","03","Quais cidades tiveram as maiores viradas?",
-    sortedFlip.length?sortedFlip[0].name+" ("+sortedFlip[0].uf+") aparece entre as maiores mudanças em votos.":"Nenhuma cidade do filtro teve essa virada.",q3,"onde maior virada cidades rio de janeiro itabirito ranking",aa.onde));
+    method("Classificação por diferença em votos absolutos: cidades maiores podem aparecer primeiro. A classificação proporcional exige outro cálculo; empates não contam como virada.");
+  }
+  cards.push(card("onde","03",city?"Como minha cidade se compara às outras do estado?":"Quais cidades tiveram as maiores viradas?",
+    short3,q3,"onde maior virada cidades ranking municipal estado proporcional",aa.onde||deepLink==="onde"));
   var turnout=n(p2.comparecimento)-n(p1.comparecimento);
   var abst=n(p2.abstencoes)-n(p1.abstencoes);
   var q4='<p class="qa-lead">'+(turnout>0?"Mais pessoas compareceram no segundo turno.":turnout<0?"Menos pessoas compareceram no segundo turno.":"O comparecimento foi igual nos dois turnos.")+'</p>'+
