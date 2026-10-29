@@ -49,6 +49,8 @@ def main():
     linhas_excluidas = Counter()
     linhas_lidas = 0
     votos_por_turno = Counter()
+    votos_exterior_por_turno = Counter()
+    linhas_exterior_por_turno = Counter()
 
     with ARQUIVO.open("r", encoding="latin-1", newline="", buffering=1024 * 1024) as arquivo:
         leitor = csv.DictReader(arquivo, delimiter=";", quotechar='"')
@@ -104,6 +106,9 @@ def main():
             nomes_municipios[(uf, cod_municipio)] = linha["NM_MUNICIPIO"].strip()
             municipios[chave][numero_candidato] += votos
             votos_por_turno[turno] += votos
+            if uf == "ZZ":
+                votos_exterior_por_turno[turno] += votos
+                linhas_exterior_por_turno[turno] += 1
 
     print("\n=== VALIDACAO ===")
     print("Linhas totais lidas:", f"{linhas_lidas:,}")
@@ -112,6 +117,10 @@ def main():
               f"{len({n for t, n in candidatos if t == turno})} candidatos, "
               f"{votos_por_turno[turno]:,} votos validos nas 27 UFs e no exterior")
     print("Municipios/turnos agregados:", f"{len(municipios):,}")
+    for turno in (1, 2):
+        print(f"Exterior ZZ - turno {turno}: {votos_exterior_por_turno[turno]:,} votos validos, "
+              f"{linhas_exterior_por_turno[turno]:,} linhas; "
+              f"27 UFs: {votos_por_turno[turno] - votos_exterior_por_turno[turno]:,} votos")
     print("Linhas ignoradas por motivo:", dict(linhas_excluidas))
 
     if not linhas_turno[1] or not linhas_turno[2]:
@@ -149,8 +158,28 @@ def main():
             "votos": dict(sorted(votos_candidatos.items()))
         })
 
+    # Exterior separado para a interface: localidades conforme classificacao do CSV.
+    exterior_localidades = [
+        {
+            "turno": registro["turno"],
+            "codigo": registro["codigo"],
+            "localidade": registro["municipio"],
+            "validos": registro["validos"],
+            "votos": registro["votos"],
+        }
+        for registro in registros if registro["uf"] == "ZZ"
+    ]
+    exterior_por_turno = {
+        str(t): {
+            "validos": votos_exterior_por_turno[t],
+            "por_candidato": dict(estados[t].get("ZZ", {})),
+            "localidades": [r for r in exterior_localidades if r["turno"] == t],
+        }
+        for t in (1, 2)
+    }
+
     resultado = {
-        "versao": 2,
+        "versao": 3,
         "fonte": "TSE - votacao_candidato_munzona_2026_BRASIL.csv",
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "observacoes": [
@@ -158,6 +187,7 @@ def main():
             "Nao contem votos brancos, nulos, comparecimento ou abstencoes.",
             "O total nacional inclui as 27 UFs e o exterior (ZZ); BR e VT nao sao somados.",
             "A chave ZZ no objeto estados representa os votos no exterior, nao uma unidade federativa.",
+            "As localidades do exterior sao identificadas conforme CD_MUNICIPIO e NM_MUNICIPIO no CSV; nao presumir pais sem validacao.",
             "Conferir os totais com a apuracao oficial antes de publicar."
         ],
         "candidatos": {
@@ -168,6 +198,10 @@ def main():
         },
         "nacional": {str(t): dict(totais[t]) for t in (1, 2)},
         "totais_conferidos": {str(t): votos_por_turno[t] for t in (1, 2)},
+        "totais_27_ufs": {
+            str(t): votos_por_turno[t] - votos_exterior_por_turno[t] for t in (1, 2)
+        },
+        "exterior": exterior_por_turno,
         "estados": {
             str(t): {uf: dict(v) for uf, v in sorted(estados[t].items())}
             for t in (1, 2)
