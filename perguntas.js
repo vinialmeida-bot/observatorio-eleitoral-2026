@@ -55,7 +55,7 @@
   var lookup=normal(question+" "+short+" "+terms);
   var linked=global.location?new URL(global.location.href).searchParams.get("pergunta"):null;
   opened=opened||linked===id;
-  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button></div></details></article>';
+  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<p class="qa-source">Fonte dos dados: <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Tribunal Superior Eleitoral (TSE)</a>. Compare os números com a metodologia indicada acima.</p><button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button></div></details></article>';
  }
 
  function make(){
@@ -99,6 +99,7 @@
   var sortedFlip=toLula.slice().sort(function(a,b){return b.delta-a.delta;}).slice(0,5);
   var sortedReverse=toFlavio.slice().sort(function(a,b){return a.delta-b.delta;}).slice(0,5);
   var largest=locals.slice().sort(function(a,b){return b.delta-a.delta;}).slice(0,5);
+  var largestFlavio=locals.slice().sort(function(a,b){return a.delta-b.delta;}).slice(0,5);
   var pps=function(x){var a=sum(x.one.votos),b=sum(x.two.votos);return(b?x.m2/b:0)-(a?x.m1/a:0);};
   var q3,short3;
   if(city){
@@ -115,8 +116,10 @@
     list(sortedFlip,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Antes, Flávio tinha '+fmt(-x.m1)+' votos de vantagem. Depois, Lula ficou '+fmt(x.m2)+' à frente.</span></li>';})+
     '<h3>E onde Lula estava à frente e Flávio passou à frente?</h3>'+
     list(sortedReverse,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Antes, Lula tinha '+fmt(x.m1)+' votos de vantagem. Depois, Flávio ficou '+fmt(-x.m2)+' à frente.</span></li>';})+
-    '<h3>Maiores mudanças na diferença, com ou sem virada</h3>'+
-    list(largest,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>A diferença entre Lula e Flávio mudou '+fmt(x.delta)+' votos a favor de Lula.</span></li>';})+
+    '<h3>Maiores mudanças da diferença a favor de Lula, com ou sem virada</h3>'+
+    list(largest,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Mudança de '+fmt(Math.abs(x.delta))+' votos a favor de '+(x.delta>=0?"Lula":"Flávio")+'.</span></li>';})+
+    '<h3>Maiores mudanças a favor de Flávio, com ou sem virada</h3>'+
+    list(largestFlavio,function(x){return '<li><strong>'+safe(x.name)+' ('+safe(x.uf)+')</strong><span>Mudança de '+fmt(Math.abs(x.delta))+' votos a favor de '+(x.delta<0?"Flávio":"Lula")+'.</span></li>';})+
     method("Classificação por diferença em votos absolutos: cidades maiores podem aparecer primeiro. A classificação proporcional exige outro cálculo; empates não contam como virada.");
   }
   cards.push(card("onde","03",city?"Como minha cidade se compara às outras do estado?":"Quais cidades tiveram as maiores viradas?",
