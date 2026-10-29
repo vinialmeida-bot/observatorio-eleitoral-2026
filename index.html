@@ -89,6 +89,14 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 .qa-share-status{background:#e9f5ec;padding:10px;border-radius:8px;margin:10px 0;font-size:.87rem}
 .qa-share-status:empty{display:none}
 @media(max-width:680px){.qa-city{padding:15px}.qa-city-suggestions button{padding:12px}.qa-city-profile .qa-stats{grid-template-columns:1fr}}
+.nav-more{border:1px solid #d7e6dc;border-radius:9px;background:#fff;flex:1 0 100%}
+.nav-more summary{list-style:none;padding:10px 14px;font-weight:700;cursor:pointer;color:#186047;font-size:.9rem}
+.nav-more summary::-webkit-details-marker{display:none}
+.nav-more summary::after{content:"⌄";margin-left:9px;color:#087653;font-size:1.15rem}
+.nav-more[open] summary::after{content:"⌃"}
+.nav-more-content{display:flex;gap:7px;flex-wrap:wrap;padding:8px 10px 12px;border-top:1px solid #e0ece5}
+.nav-more-content button{background:#f4f9f6}
+@media(max-width:680px){.nav-more{grid-column:1/-1}.nav-more-content{display:grid;grid-template-columns:1fr 1fr}.nav-more-content button{width:100%;min-width:0}}
 </style>
 </head>
 <body>
@@ -101,14 +109,19 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <main>
 <div class="notice" id="notice" role="status">Carregando a base de resultados...</div>
 <nav aria-label="Seções do observatório">
-<button type="button" data-tab="perguntas" aria-selected="true">Perguntas respondidas</button>
+<button type="button" data-tab="perguntas" aria-selected="true">Perguntas e minha cidade</button>
 <button type="button" data-tab="panorama" aria-selected="false">Resultado explicado</button>
-<button type="button" data-tab="duelo" aria-selected="false">Dois candidatos</button>
-<button type="button" data-tab="turnos" aria-selected="false">O que mudou?</button>
+<button type="button" data-tab="participacao" aria-selected="false">Comparecimento e abstenção</button>
+<details class="nav-more">
+<summary>Mais consultas e explicações</summary>
+<div class="nav-more-content">
+<button type="button" data-tab="duelo" aria-selected="false">Comparar candidatos</button>
+<button type="button" data-tab="turnos" aria-selected="false">Mudanças entre turnos</button>
 <button type="button" data-tab="estados" aria-selected="false">Estados e exterior</button>
 <button type="button" data-tab="municipios" aria-selected="false">Tabela de municípios</button>
-<button type="button" data-tab="participacao" aria-selected="false">Quem votou e quem faltou?</button>
 <button type="button" data-tab="entenda" aria-selected="false">Palavras explicadas</button>
+</div>
+</details>
 </nav>
 <div class="filters">
 <label for="region">Qual local você quer analisar?
