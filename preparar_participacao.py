@@ -30,14 +30,85 @@ URL = ("https://cdn.tse.jus.br/estatistica/sead/odsele/"
        "detalhe_votacao_munzona/detalhe_votacao_munzona_2026.zip")
 UFS = set("AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO ZZ".split())
 CAMPOS = ("aptos", "comparecimento", "abstencoes", "validos",
-          "brancos", "nulos", "anulados")
+          "brancos", "nulos", "nulos_comuns", "nulos_tecnicos", "anulados")
 
 
-def n(v):
+def n(v, nome="campo", linha=0):
     s = str(v or "").strip()
     if not s or s in {"#NULO", "#NE"}:
-        return 0
-    return int(s)
+        raise ValueError(f"Campo numerico vazio/indefinido: {nome}, linha {linha}")
+    try:
+        numero = int(s)
+    except ValueError as erro:
+        raise ValueError(f"Valor nao inteiro em {nome}, linha {linha}: {s!r}") from erro
+    if numero < 0:
+        raise ValueError(f"Valor negativo em {nome}, linha {linha}: {numero}")
+    return numero
+
+
+def coluna(colunas, opcoes, obrigatoria=True):
+    for nome in opcoes:
+        if nome in colunas:
+            return nome
+    if obrigatoria:
+        raise ValueError("Nenhuma destas colunas existe no CSV: " + ", ".join(opcoes))
+    return None
+
+
+def mapear_colunas(colunas):
+    m = {
+        "aptos": coluna(colunas, ("QT_APTOS",)),
+        "comparecimento": coluna(colunas, ("QT_COMPARECIMENTO",)),
+        "abstencoes": coluna(colunas, ("QT_ABSTENCOES",)),
+        "validos": coluna(colunas, ("QT_TOTAL_VOTOS_VALIDOS", "QT_VOTOS_VALIDOS")),
+        "brancos": coluna(colunas, ("QT_VOTOS_BRANCOS",)),
+        "nulos_comuns": coluna(colunas, ("QT_VOTOS_NULOS",), False),
+        "nulos_total": coluna(colunas, ("QT_TOTAL_VOTOS_NULOS",), False),
+        "nulos_tecnicos": coluna(colunas, ("QT_VOTOS_NULOS_TECNICOS",), False),
+        "anulados_total": coluna(colunas, ("QT_TOTAL_VOTOS_ANULADOS",), False),
+        "anulados": coluna(colunas, ("QT_VOTOS_ANULADOS",), False),
+        "anulados_sub_judice": coluna(
+            colunas, ("QT_VOTOS_ANULADOS_APU_SEP", "QT_VOTOS_ANULADOS_SUB_JUDICE"), False
+        ),
+        "total_votos": coluna(colunas, ("QT_TOTAL_VOTOS", "QT_VOTOS_TOTAL"), False),
+    }
+    if not m["nulos_comuns"] and not m["nulos_total"]:
+        raise ValueError("Nao existe coluna de votos nulos no CSV")
+    return m
+
+
+def valores_linha(row, mapa, linha):
+    def obter(chave):
+        nome = mapa[chave]
+        return n(row[nome], nome, linha) if nome else 0
+
+    comuns = obter("nulos_comuns")
+    tecnicos = obter("nulos_tecnicos")
+    nulos = obter("nulos_total") if mapa["nulos_total"] else comuns + tecnicos
+    if mapa["nulos_total"] and mapa["nulos_comuns"] and nulos != comuns + tecnicos:
+        raise ValueError(f"Nulos comuns + tecnicos nao conferem com total na linha {linha}")
+    if not mapa["nulos_comuns"]:
+        comuns = nulos - tecnicos
+    if comuns < 0:
+        raise ValueError(f"Nulos comuns negativos na linha {linha}")
+    anulados = (
+        obter("anulados_total") if mapa["anulados_total"]
+        else obter("anulados") + obter("anulados_sub_judice")
+    )
+    resultado = {
+        "aptos": obter("aptos"),
+        "comparecimento": obter("comparecimento"),
+        "abstencoes": obter("abstencoes"),
+        "validos": obter("validos"),
+        "brancos": obter("brancos"),
+        "nulos": nulos,
+        "nulos_comuns": comuns,
+        "nulos_tecnicos": tecnicos,
+        "anulados": anulados,
+    }
+    if mapa["total_votos"] and obter("total_votos") != resultado["comparecimento"]:
+        raise ValueError(f"Total de votos difere do comparecimento na linha {linha}")
+    return resultado
 
 
 def codigo(s):
@@ -55,9 +126,15 @@ def somar(destino, origem):
 
 
 def baixar():
-    if ZIP.is_file() and ZIP.stat().st_size > 0:
-        print("ZIP ja existe:", ZIP, "-", f"{ZIP.stat().st_size:,}", "bytes")
-        return
+    if ZIP.is_file():
+        try:
+            with zipfile.ZipFile(ZIP) as z:
+                if z.testzip() is None:
+                    print("ZIP ja existe e foi verificado:", ZIP)
+                    return
+        except zipfile.BadZipFile:
+            pass
+        raise ValueError("ZIP existente corrompido; renomeie ou remova o arquivo")
     print("Baixando arquivo oficial do TSE:", URL)
     temp = ZIP.with_suffix(".part")
     try:
@@ -126,16 +203,13 @@ def executar():
             colunas = set(reader.fieldnames or [])
             print("Colunas identificadas:", ", ".join(reader.fieldnames or []))
             exigidas = {
-                "ANO_ELEICAO", "NR_TURNO", "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO",
-                "CD_CARGO", "QT_APTOS", "QT_COMPARECIMENTO", "QT_ABSTENCOES",
-                "QT_VOTOS_VALIDOS", "QT_VOTOS_BRANCOS", "QT_VOTOS_NULOS"
+                "ANO_ELEICAO", "NR_TURNO", "SG_UF", "CD_MUNICIPIO", "CD_CARGO"
             }
             faltantes = exigidas - colunas
             if faltantes:
-                sys.exit("ERRO: colunas obrigatorias ausentes: " + ", ".join(sorted(faltantes)))
-            campo_anulados = ("QT_VOTOS_ANULADOS" if "QT_VOTOS_ANULADOS" in colunas
-                             else "QT_VOTOS_ANULADOS_APU_SEP" if "QT_VOTOS_ANULADOS_APU_SEP" in colunas
-                             else None)
+                raise ValueError("Colunas de identificacao ausentes: " + ", ".join(sorted(faltantes)))
+            mapa = mapear_colunas(colunas)
+            print("Colunas usadas:", mapa)
             for i, row in enumerate(reader, 1):
                 if i % 100_000 == 0:
                     print(f"  {i:,} linhas examinadas...")
@@ -157,17 +231,7 @@ def executar():
                 if not cod:
                     ignoradas["codigo_municipio_vazio"] += 1
                     continue
-                valores = {
-                    "aptos": n(row["QT_APTOS"]),
-                    "comparecimento": n(row["QT_COMPARECIMENTO"]),
-                    "abstencoes": n(row["QT_ABSTENCOES"]),
-                    "validos": n(row["QT_VOTOS_VALIDOS"]),
-                    "brancos": n(row["QT_VOTOS_BRANCOS"]),
-                    "nulos": n(row["QT_VOTOS_NULOS"]),
-                    "anulados": n(row[campo_anulados]) if campo_anulados else 0,
-                }
-                if any(x < 0 for x in valores.values()):
-                    sys.exit(f"ERRO: valor negativo na linha {i}")
+                valores = valores_linha(row, mapa, i)
                 chave = (turno, uf, cod)
                 reg = territorios[chave]
                 somar(reg, valores)
@@ -179,7 +243,7 @@ def executar():
     print("Linhas presidenciais:", dict(linhas))
     print("Linhas ignoradas:", dict(ignoradas))
     print("Municipios/localidades por turno:", dict(Counter(t for t, _, _ in territorios)))
-    print("Coluna de votos anulados:", campo_anulados or "indisponivel")
+    print("Colunas de votos anulados:", mapa["anulados_total"] or mapa["anulados"], mapa["anulados_sub_judice"])
     totais = {"1": novo(), "2": novo()}
     exterior = {"1": novo(), "2": novo()}
     estados = {"1": defaultdict(novo), "2": defaultdict(novo)}
@@ -201,13 +265,15 @@ def executar():
         if d["validos"] != base_nacional:
             problemas.append(f"turno {t}: votos validos nao batem ({d['validos']} vs {base_nacional})")
         dif_aptos = d["aptos"] - d["comparecimento"] - d["abstencoes"]
-        dif_urna = d["comparecimento"] - d["validos"] - d["brancos"] - d["nulos"]
+        dif_urna = d["comparecimento"] - d["validos"] - d["brancos"] - d["nulos"] - d["anulados"]
         print("  aptos - comparecimento - abstencoes:", f"{dif_aptos:,}")
-        print("  comparecimento - validos - brancos - nulos:", f"{dif_urna:,}")
-        if dif_aptos != 0:
-            problemas.append(f"turno {t}: diferenca aptos/comparecimento/abstencoes = {dif_aptos}")
+        print("  comparecimento - validos - brancos - nulos - anulados:", f"{dif_urna:,}")
+        if dif_aptos < 0:
+            problemas.append(f"turno {t}: comparecimento + abstencoes ultrapassam aptos em {-dif_aptos}")
+        elif dif_aptos > 0:
+            print("  NOTA: saldo positivo de aptos pode envolver secoes nao instaladas; nao e abstencao.")
         if dif_urna != 0:
-            problemas.append(f"turno {t}: diferenca comparecimento/validos/brancos/nulos = {dif_urna}; investigar outras categorias")
+            problemas.append(f"turno {t}: diferenca de {dif_urna} votos; investigar categorias")
         print("  Exterior (ZZ):", {k: exterior[t][k] for k in CAMPOS})
     chaves_atuais = set(territorios)
     faltantes = set(base_local) - chaves_atuais
@@ -225,6 +291,9 @@ def executar():
         print("  EXEMPLO DIVERGENCIA:", x)
     if faltantes:
         problemas.append(f"{len(faltantes)} locais da base anterior ausentes no detalhe")
+    extras_com_votos = [chave for chave in extras if territorios[chave]["validos"] != 0]
+    if extras_com_votos:
+        problemas.append(f"{len(extras_com_votos)} locais extras com votos validos")
     if divergentes:
         problemas.append(f"{len(divergentes)} locais com votos validos divergentes")
     if not all(linhas[t] for t in ("1", "2")):
@@ -236,24 +305,30 @@ def executar():
         print("NAO foi gerado JSON novo. Envie esta tela para investigarmos.")
         return 2
     saida = {
-        "versao": 1,
+        "versao": 2,
         "fonte": "TSE - detalhe_votacao_munzona_2026.zip",
         "url_fonte": URL,
         "sha256_zip": sha.hexdigest(),
+        "arquivo_csv": arquivo,
+        "colunas_utilizadas": mapa,
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(),
         "observacoes": [
             "Somente presidente (CD_CARGO=1); duas rodadas; Brasil completo inclui ZZ (exterior).",
             "Percentuais de abstencao usam aptos; de brancos e nulos usam comparecimento.",
-            "Os totais de aptos do TSE podem conter 39 registros duplicados de transferencia temporaria; nao foi feita correcao territorial arbitraria.",
-            "Outras categorias de voto, se presentes, precisam de conferencia antes da publicacao."
+            "Nulos inclui nulos tecnicos quando presentes; nulos_tecnicos e subconjunto de nulos.",
+            "Saldo positivo de aptos pode incluir eleitores de secoes nao instaladas; nao e automaticamente abstencao.",
+            "Linhas separadas de voto em transito sao somadas, nao descartadas.",
+            "Localidades extras com zero voto valido sao preservadas para analise de comparecimento."
         ],
         "nacional": totais,
         "exterior": exterior,
         "estados": {t: dict(v) for t, v in estados.items()},
         "municipios": detalhes
     }
-    with SAIDA.open("w", encoding="utf-8") as f:
+    temporario = SAIDA.with_suffix(".json.tmp")
+    with temporario.open("w", encoding="utf-8") as f:
         json.dump(saida, f, ensure_ascii=False, separators=(",", ":"))
+    temporario.replace(SAIDA)
     print("\n=== VALIDACAO APROVADA ===")
     print("JSON GERADO:", SAIDA)
     print("Tamanho:", f"{SAIDA.stat().st_size / (1024*1024):.2f} MiB")
@@ -264,6 +339,6 @@ def executar():
 if __name__ == "__main__":
     try:
         sys.exit(executar())
-    except (OSError, ValueError, KeyError, zipfile.BadZipFile) as e:
+    except (OSError, ValueError, KeyError, zipfile.BadZipFile, json.JSONDecodeError) as e:
         print("ERRO:", type(e).__name__, e)
         sys.exit(1)
