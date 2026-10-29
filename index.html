@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#086044">
+<meta name="description" content="Observatório Eleitoral 2026: dados de votação explicados de forma simples.">
+<title>Observatório Eleitoral 2026</title>
+<style>
+:root{--green:#106847;--ink:#17342c;--muted:#536960;--bg:#f5f8f6;--line:#dce6e0;--gold:#eabc49;--blue:#3486bb;--orange:#d18b3a}
+*{box-sizing:border-box}html{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;font-size:16px}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55}button{font:inherit}a{color:#086a4a}a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+header{background:linear-gradient(110deg,#06452f,#187856);color:#fff;padding:34px max(20px,calc((100vw - 1120px)/2)) 32px}
+.brand{font-size:.8rem;letter-spacing:.13em;font-weight:800;color:#d9eee5}.hero{font-size:clamp(1.7rem,4.5vw,2.7rem);line-height:1.17;margin:12px 0}.hero-desc{font-size:1.05rem;color:#e3f2eb;max-width:760px}.flag{display:inline-block;background:#ffe8a9;color:#553b08;padding:7px 11px;border-radius:6px;font-weight:750;font-size:.78rem;margin-top:14px}
+main{max-width:1120px;margin:0 auto;padding:20px}.notice{background:#e9f3ed;border-left:4px solid var(--green);border-radius:8px;padding:13px 16px;margin:0 0 20px;font-size:.94rem}
+.tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}.tabs button{cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;color:var(--ink);font-weight:700}.tabs button[aria-selected=true]{background:var(--green);color:#fff;border-color:var(--green)}
+.panel{background:#fff;border:1px solid var(--line);padding:22px;border-radius:14px;margin:14px 0;box-shadow:0 2px 8px #143b2210}h2{font-size:1.5rem;line-height:1.25;margin:3px 0 10px}h3{font-size:1.08rem;margin:4px 0 8px}p{margin:5px 0 12px}.sub{color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:17px 0}.metric{border-radius:10px;border:1px solid var(--line);padding:16px;background:#fafdfb}.metric strong{display:block;font-size:1.45rem;margin-top:4px}.metric span{font-size:.88rem;color:var(--muted)}
+.pending{color:#5f7269;font-weight:650}.empty{padding:25px;background:#f5f7f5;border:1px dashed #afc5b8;border-radius:11px;margin-top:13px;text-align:center}.empty strong{display:block;font-size:1.08rem}.empty p{color:var(--muted);margin-top:8px}
+.def{border-top:1px solid var(--line);padding:14px 0}.def:first-child{border-top:0}.def strong{display:block}.explain{background:#fff8e5;border-left:4px solid var(--gold);border-radius:7px;padding:12px 14px;margin:12px 0}.step{font-weight:800;color:var(--green);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}.pill{display:inline-block;border-radius:20px;padding:5px 10px;background:#edf5ef;color:#165d43;font-size:.82rem;font-weight:650}
+footer{padding:20px;max-width:1120px;margin:auto;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)}section[hidden]{display:none}
+@media(max-width:680px){main{padding:12px}header{padding:24px 18px}.panel{padding:15px}.cols,.metrics{grid-template-columns:1fr}.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.tabs button{font-size:.9rem;text-align:left}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">OBSERVATÓRIO ELEITORAL · BRASIL 2026</div>
+  <h1 class="hero">Entenda os números da eleição</h1>
+  <p class="hero-desc">Resultados, candidatos, municípios e participação eleitoral em linguagem simples, com explicações ao lado de cada análise.</p>
+  <span class="flag">SITE EM PREPARAÇÃO · RESULTADOS AINDA NÃO PUBLICADOS</span>
+</header>
+<main>
+ <p class="notice"><strong>Transparência:</strong> esta é a primeira versão do site. Ainda não carregamos os números oficiais. Nenhum resultado eleitoral é apresentado sem conferir os dados do TSE.</p>
+ <nav class="tabs" aria-label="Áreas de análise">
+  <button type="button" aria-selected="true" data-tab="resultados">Quem recebeu mais votos?</button>
+  <button type="button" aria-selected="false" data-tab="comparacao">Comparar 1 × 1</button>
+  <button type="button" aria-selected="false" data-tab="turnos">1º × 2º turno</button>
+  <button type="button" aria-selected="false" data-tab="participacao">Quem votou?</button>
+  <button type="button" aria-selected="false" data-tab="municipios">Municípios</button>
+ </nav>
+ <section id="resultados" aria-labelledby="rtitle">
+  <div class="panel"><div class="step">Visão geral</div><h2 id="rtitle">Quem recebeu mais votos?</h2><p class="sub">Todos os candidatos do primeiro turno, do mais votado para o menos votado. Você poderá escolher um estado e ver como os resultados mudam.</p>
+   <div class="metrics"><div class="metric"><span>Votos válidos</span><strong class="pending">Aguardando dados</strong></div><div class="metric"><span>Candidatura mais votada</span><strong class="pending">Aguardando dados</strong></div><div class="metric"><span>Municípios analisados</span><strong class="pending">Aguardando dados</strong></div></div>
+   <div class="empty"><strong>Gráfico de candidatos</strong><p>Ele aparecerá aqui depois que processarmos e verificarmos o CSV oficial.</p></div>
+   <div class="explain"><strong>O que significa percentual de votos válidos?</strong> Se um candidato tiver 40%, isso significa que ele recebeu 40 de cada 100 votos válidos. Votos brancos, nulos e ausências não entram nessa conta.</div>
+  </div>
+ </section>
+ <section id="comparacao" hidden aria-labelledby="ctitle">
+  <div class="panel"><div class="step">Comparação direta</div><h2 id="ctitle">Qual foi a diferença entre dois candidatos?</h2><p class="sub">Você poderá selecionar qualquer par de candidatos e descobrir quem recebeu mais votos em cada estado e município.</p>
+  <div class="cols"><div class="metric"><span>Candidato A</span><strong class="pending">Seleção disponível com os dados</strong></div><div class="metric"><span>Candidato B</span><strong class="pending">Seleção disponível com os dados</strong></div></div>
+  <div class="empty"><strong>Comparação 1 × 1</strong><p>Exibiremos as duas votações em barras lado a lado, com a diferença explicada.</p></div>
+  <div class="def"><strong>Diferença em votos</strong>É a quantidade de votos de um candidato menos a do outro. Exemplo: 120.000 contra 100.000 significa 20.000 votos de diferença.</div>
+  <div class="def"><strong>Diferença em pontos percentuais (p.p.)</strong>É a distância entre duas porcentagens. Exemplo: 45% menos 40% = 5 pontos percentuais. Não é o mesmo que dizer 5% de aumento.</div>
+  <div class="explain">Comparar dois candidatos do primeiro turno não é simular um segundo turno. É apenas analisar os votos realmente registrados para cada candidatura.</div>
+  </div>
+ </section>
+ <section id="turnos" hidden aria-labelledby="ttitle">
+  <div class="panel"><div class="step">Mudanças da eleição</div><h2 id="ttitle">O que mudou do primeiro para o segundo turno?</h2><p class="sub">Vamos comparar as votações dos finalistas, a diferença entre eles e a participação dos eleitores nos dois turnos.</p>
+  <div class="cols"><div class="metric"><span>Primeiro turno</span><strong class="pending">Aguardando validação</strong></div><div class="metric"><span>Segundo turno</span><strong class="pending">Aguardando validação</strong></div></div>
+  <div class="empty"><strong>Gráficos de evolução entre turnos</strong><p>Os resultados aparecerão quando confirmarmos os dois turnos no arquivo do TSE.</p></div>
+  <div class="def"><strong>Ganhou votos</strong>O candidato recebeu mais votos no segundo turno do que no primeiro, considerando o mesmo território.</div>
+  <div class="def"><strong>Ganhou pontos percentuais</strong>A participação dele nos votos válidos aumentou. Isso pode ocorrer mesmo que o total de votos varie pouco, pois o total de votos válidos também pode mudar.</div>
+  <div class="def"><strong>O saldo mudou</strong>A diferença de votos entre os dois finalistas aumentou ou diminuiu de um turno para o outro.</div>
+  <div class="explain"><strong>Importante:</strong> os totais por turno não permitem saber como cada eleitor votou nas duas datas. Portanto, não afirmaremos que votos foram transferidos de um candidato para outro.</div>
+  </div>
+ </section>
+ <section id="participacao" hidden aria-labelledby="ptitle">
+  <div class="panel"><div class="step">Participação eleitoral</div><h2 id="ptitle">Quantas pessoas votaram ou faltaram?</h2><p class="sub">Vamos mostrar quantos eleitores estavam aptos, quantos compareceram e como os votos foram registrados em cada turno.</p>
+  <div class="empty"><strong>Gráficos de comparecimento e tipos de voto</strong><p>Para calcular esses indicadores corretamente, integraremos os arquivos de comparecimento e apuração do TSE.</p></div>
+  <div class="def"><strong>Comparecimento</strong>Quantidade de eleitores que foram votar.</div>
+  <div class="def"><strong>Abstenção</strong>Quantidade de eleitores aptos que não compareceram. A taxa é calculada sobre o eleitorado apto.</div>
+  <div class="def"><strong>Voto em branco</strong>Voto registrado na opção “branco”. Não é atribuído a candidato.</div>
+  <div class="def"><strong>Voto nulo</strong>Voto registrado sem escolha válida de candidatura. Não é atribuído a candidato.</div>
+  <div class="explain">Brancos e nulos são contabilizados entre os votos de quem compareceu. Abstenção é ausência, e não um tipo de voto.</div>
+  </div>
+ </section>
+ <section id="municipios" hidden aria-labelledby="mtitle">
+  <div class="panel"><div class="step">Resultados locais</div><h2 id="mtitle">Como votou cada município?</h2><p class="sub">Você poderá procurar uma cidade, escolher um candidato e conferir a votação do primeiro e do segundo turno.</p>
+  <div class="empty"><strong>Busca e tabela de municípios</strong><p>Os filtros e os resultados serão liberados após a preparação dos arquivos nacionais.</p></div>
+  <div class="def"><strong>Município em que um candidato ficou em primeiro</strong>É o município onde ele recebeu mais votos que qualquer outro candidato naquele turno.</div>
+  <div class="def"><strong>Porte eleitoral do município</strong>É o tamanho do município medido pela quantidade de votos válidos, e não pela população.</div>
+  </div>
+ </section>
+ <div class="panel"><h3>De onde virão os números?</h3><p>As análises serão preparadas a partir dos arquivos oficiais do Tribunal Superior Eleitoral (TSE), com indicação de data de atualização e metodologia de cálculo.</p><p><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Consultar a fonte: Dados Abertos do TSE</a></p><span class="pill">Projeto independente, não é um site oficial do TSE</span></div>
+</main>
+<footer>Observatório Eleitoral 2026 · Primeiro layout publicado sem números de demonstração. Os dados reais serão incluídos após validação.</footer>
+<script>
+(function(){
+ const tabs=[...document.querySelectorAll('[data-tab]')];
+ const sections=[...document.querySelectorAll('main section[id]')];
+ tabs.forEach(btn=>btn.addEventListener('click',function(){
+  tabs.forEach(t=>t.setAttribute('aria-selected',String(t===btn)));
+  sections.forEach(s=>s.hidden=s.id!==btn.dataset.tab);
+ }));
+})();
+</script>
+</body>
+</html>
