@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#086247">
-<meta name="description" content="Entenda os votos das eleições presidenciais de 2026 com dados do TSE e linguagem simples.">
-<title>Observatório Eleitoral 2026 | Entenda os votos</title>
+<meta name="description" content="Entenda as eleições de 2026 sem precisar interpretar gráficos. Respostas simples, dados do TSE e explicações fáceis.">
+<title>Observatório Eleitoral 2026 | Perguntas respondidas com dados</title>
 <style>
 :root{--dark:#103d2f;--green:#087653;--light:#f4f8f6;--paper:#fff;--line:#dce7e1;--text:#20352f;--muted:#567169;--yellow:#f3b944;--blue:#287eba;--orange:#df9039;--gray:#899b95}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;margin:0;background:var(--light);color:var(--text)}
@@ -27,25 +27,68 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 .definition{padding:12px 0;border-top:1px solid var(--line)}.definition strong{display:block}.spacer{margin-top:16px}.status{font-size:.9rem;font-weight:700}.muted{color:var(--muted)}footer{max-width:1160px;margin:auto;padding:15px 16px 35px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line)}
 [hidden]{display:none!important}
 @media(max-width:680px){.cols,.stats{grid-template-columns:1fr}main{padding:12px}.panel{padding:15px}nav{display:grid;grid-template-columns:1fr 1fr}nav button{text-align:left;font-size:.86rem}.filters label{width:100%}.grid2{grid-template-columns:1fr 1fr}h1{font-size:1.85rem}.statebar{grid-template-columns:35px 1fr 90px}}
+.qa-intro{background:linear-gradient(120deg,#e7f4ec,#f8fcf9);border:1px solid #c5e2d2;border-radius:15px;padding:clamp(18px,4vw,30px);margin-bottom:15px}
+.qa-intro h2{font-size:clamp(1.55rem,3vw,2.15rem);color:#174e38;max-width:800px}.qa-intro>p{max-width:760px}
+.qa-overline{font-size:.78rem;font-weight:800;letter-spacing:.1em;color:#087653}
+.qa-selected{background:white;border-radius:9px;padding:12px;margin-top:16px;font-size:.91rem;border:1px solid #daeae0}
+.qa-selected span{display:block;color:#557469;font-size:.87rem}
+.qa-search-line{display:flex;gap:14px;align-items:end;border-radius:11px;padding:15px;background:#fff;border:1px solid var(--line)}
+.qa-search-line label{display:flex;flex:1;flex-direction:column;gap:4px}
+.qa-search-line label span{font-size:.85rem;color:var(--muted)}
+.qa-search-line input{flex:1;min-width:0;width:100%;max-width:540px}
+.qa-count{font-size:.87rem;color:var(--muted);margin:10px 2px}
+.qa-card{background:white;border:1px solid #d9e5de;border-radius:13px;margin:10px 0;overflow:hidden;box-shadow:0 2px 8px #18452e09}
+.qa-card[hidden]{display:none!important}
+.qa-card summary{display:flex;align-items:start;gap:12px;cursor:pointer;list-style:none;padding:18px}
+.qa-card summary::-webkit-details-marker{display:none}
+.qa-card summary:focus-visible{outline:3px solid #eebf50;outline-offset:-3px}
+.qa-card summary:hover{background:#f6faf8}
+.qa-index{display:flex;align-items:center;justify-content:center;background:#e5f2e9;color:#087653;border-radius:9px;font-size:.83rem;font-weight:800;width:37px;height:37px;flex:0 0 37px}
+.qa-question{min-width:0;flex:1}
+.qa-question strong{display:block;font-size:1.05rem;line-height:1.35}
+.qa-question small{display:block;font-size:.89rem;line-height:1.45;margin-top:6px;font-weight:400;color:#567166}
+.qa-chevron{font-size:1.4rem;color:#087653;line-height:1}
+.qa-card details[open] .qa-chevron{transform:rotate(180deg)}
+.qa-answer{border-top:1px solid #e5eee8;padding:18px 24px 20px 67px;line-height:1.7}
+.qa-answer p{max-width:870px;margin:8px 0 14px}
+.qa-answer .qa-lead{font-size:1.08rem;color:#164832}
+.qa-answer h3{margin-top:19px}
+.qa-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:16px 0}
+.qa-stat{display:flex;flex-direction:column;gap:5px;padding:13px;background:#f0f7f2;border-radius:10px;min-width:0}
+.qa-stat span{font-size:.8rem;color:#547164}
+.qa-stat strong{font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.3;overflow-wrap:anywhere}
+.qa-stat small{font-size:.77rem;color:#567166}
+.qa-limit{border-left:4px solid #e4b950;background:#fff8e9;padding:10px 13px;border-radius:6px}
+.qa-method{font-size:.83rem;color:#557469;border-top:1px solid #e2eae5;padding-top:10px}
+.qa-label{display:block;font-size:.85rem;font-weight:700;color:#476f5e;margin:12px 0 6px}
+#qaCandidate{max-width:400px;width:100%}
+.qa-list{padding-left:24px;margin:10px 0 16px;max-width:880px}
+.qa-list li{margin:0 0 11px;padding-left:4px}
+.qa-list strong,.qa-list span{display:block}
+.qa-list span{font-size:.91rem;color:#537063}
+.qa-footer{border:1px solid var(--line);border-radius:9px;background:#f7faf8;padding:15px;font-size:.84rem;color:var(--muted)}
+.explain-plain{background:#ecf6ef;border-radius:9px;padding:12px 14px;font-size:.96rem}
+@media(max-width:680px){.qa-search-line{display:block}.qa-search-line input{margin-top:10px}.qa-card summary{padding:14px 12px;gap:8px}.qa-index{width:33px;height:33px;flex-basis:33px}.qa-answer{padding:14px}.qa-stats{grid-template-columns:1fr}.qa-question strong{font-size:1rem}}
 </style>
 </head>
 <body>
 <header>
-<div class="kicker">DADOS ELEITORAIS EXPLICADOS</div>
+<div class="kicker">DADOS OFICIAIS · EXPLICADOS SEM COMPLICAÇÃO</div>
 <h1>Observatório Eleitoral 2026</h1>
-<p>Quem recebeu mais votos? O que mudou entre os turnos? Como votaram os estados, os municípios e os brasileiros no exterior?</p>
+<p>Por que a diferença mudou? Quais cidades viraram? E o que os números realmente dizem? Respostas simples para quem não quer precisar interpretar gráficos.</p>
 <span id="verification" class="verified">Conectando os resultados do TSE</span>
 </header>
 <main>
 <div class="notice" id="notice" role="status">Carregando a base de resultados...</div>
 <nav aria-label="Seções do observatório">
-<button type="button" data-tab="panorama" aria-selected="true">Quem recebeu mais votos?</button>
-<button type="button" data-tab="duelo" aria-selected="false">Comparar 1 × 1</button>
-<button type="button" data-tab="turnos" aria-selected="false">1º × 2º turno</button>
+<button type="button" data-tab="perguntas" aria-selected="true">Perguntas respondidas</button>
+<button type="button" data-tab="panorama" aria-selected="false">Resultado explicado</button>
+<button type="button" data-tab="duelo" aria-selected="false">Dois candidatos</button>
+<button type="button" data-tab="turnos" aria-selected="false">O que mudou?</button>
 <button type="button" data-tab="estados" aria-selected="false">Estados e exterior</button>
-<button type="button" data-tab="municipios" aria-selected="false">Municípios</button>
-<button type="button" data-tab="participacao" aria-selected="false">Participação e abstenção</button>
-<button type="button" data-tab="entenda" aria-selected="false">Entenda os números</button>
+<button type="button" data-tab="municipios" aria-selected="false">Minha cidade</button>
+<button type="button" data-tab="participacao" aria-selected="false">Quem votou e quem faltou?</button>
+<button type="button" data-tab="entenda" aria-selected="false">Palavras explicadas</button>
 </nav>
 <div class="filters">
 <label for="region">Qual local você quer analisar?
@@ -55,9 +98,11 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <select id="round" disabled><option value="1">Primeiro turno</option><option value="2">Segundo turno</option></select>
 </label>
 </div>
-<section id="panorama" class="page">
+<section id="perguntas" class="page"><div id="qaArea"><div class="panel"><h2>Preparando respostas com os números do TSE…</h2></div></div></section>
+<section id="panorama" class="page" hidden>
 <div class="panel"><h2>Quem recebeu mais votos?</h2><p class="sub">Cada barra mostra os votos de um candidato. A porcentagem é calculada apenas sobre os votos válidos do local e turno escolhidos.</p>
 <div class="stats" id="overviewStats"></div>
+<p class="explain-plain" id="overviewExplanation"></p>
 <div id="ranking"></div>
 <div class="tip"><strong>Como entender uma porcentagem?</strong> Se aparecer 40%, isso significa 40 votos para o candidato em cada 100 votos válidos. Brancos, nulos e ausências não entram nessa conta.</div>
 </div>
@@ -101,6 +146,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <h2>Comparecimento, abstenções, votos brancos e nulos</h2>
 <p class="sub">Selecione o turno e o território nos filtros acima. Abstenção é calculada sobre eleitores aptos; brancos e nulos sobre o comparecimento.</p>
 <div class="stats" id="participationStats"></div>
+<p class="explain-plain" id="participationExplanation"></p>
 <div id="participationBars"></div><div class="tip" id="participationRoundChange"></div>
 </div>
 <div class="cols">
@@ -133,6 +179,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 </section>
 </main>
 <footer>Observatório Eleitoral 2026 · Análise de dados públicos · Resultados sem recomendação ou preferência por candidatos.</footer>
+<script src="./perguntas.js"></script>
 <script>
 (function(){
 "use strict";
