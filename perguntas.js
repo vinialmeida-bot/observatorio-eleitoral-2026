@@ -135,14 +135,14 @@
   states.sort(function(a,b){return (b.last-b.first)-(a.last-a.first);});
   var q8='<p class="qa-lead">Considerando os 26 estados e o Distrito Federal, <strong>'+fmt(states.length)+'</strong> unidade(s) federativa(s) trocaram a liderança entre Lula e Flávio.</p>'+
    list(states,function(x){return '<li><strong>'+safe(labels[x.uf])+' ('+x.uf+')</strong><span>Primeiro turno: '+safe(howFar(x.first))+'. Segundo turno: '+safe(howFar(x.last))+'.</span></li>';})+
-   '<p>Em outros estados a diferença de votos pode ter aumentado ou diminuído sem mudança de quem ficou à frente.</p>'+
+   '<p>Em outros estados a diferença de votos pode ter aumentado ou diminuído sem mudança de quem ficou à frente. <strong>Esta pergunta considera todos os estados, mesmo quando você escolhe um território específico no filtro.</strong></p>'+
    method("Critério: liderança entre Lula e Flávio em cada turno; o exterior não é um estado.");
   cards.push(card("estados","08","Algum estado também mudou de lado?",
     states.length?states.map(function(x){return labels[x.uf];}).join(", ")+" mudou a liderança.":"Nenhum estado mudou a liderança nesta comparação.",q8,"minas gerais estado virada unidades federativas",aa.estados));
   var ext1=data.estados["1"]["ZZ"]||{},ext2=data.estados["2"]["ZZ"]||{},diffExt=margin(ext2),domScore=margin(votes("2","DOM")),nationalScore=margin(votes("2","ALL"));
   var q9='<p class="qa-lead">No segundo turno, a diferença no exterior foi de <strong>'+fmt(Math.abs(diffExt))+' votos a favor de '+winner(diffExt)+'</strong>.</p>'+
     stats([stat("Diferença no exterior",sign(diffExt),"Lula menos Flávio"),stat("Diferença no Brasil sem exterior",sign(domScore),"Lula menos Flávio"),stat("Diferença no total",sign(nationalScore),"Brasil e exterior")])+
-    '<p>O total nacional inclui os votos no exterior. A comparação acima mostra exatamente quanto eles acrescentaram à diferença entre os candidatos, sem tratar isso como uma eleição alternativa.</p>'+
+    '<p>O total nacional inclui os votos no exterior. A comparação acima mostra exatamente quanto eles acrescentaram à diferença entre os candidatos, sem tratar isso como uma eleição alternativa. <strong>Esta conta sempre mostra o Brasil inteiro, independentemente do filtro escolhido.</strong></p>'+
     method("Diferença = votos de Lula menos votos de Flávio no segundo turno. Exterior identificado por ZZ.");
   cards.push(card("exterior","09","Os votos do exterior mudaram a diferença final?",
     "No segundo turno, o exterior acrescentou "+sign(diffExt)+" votos ao saldo Lula menos Flávio.",q9,"exterior estrangeiro fora pais zz voto",aa.exterior));
