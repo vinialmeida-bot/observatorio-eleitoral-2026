@@ -85,6 +85,8 @@ def valores_linha(row, mapa, linha):
     comuns = obter("nulos_comuns")
     tecnicos = obter("nulos_tecnicos")
     nulos = obter("nulos_total") if mapa["nulos_total"] else comuns + tecnicos
+    if mapa["nulos_total"] and mapa["nulos_comuns"] and not mapa["nulos_tecnicos"]:
+        tecnicos = nulos - comuns
     if mapa["nulos_total"] and mapa["nulos_comuns"] and nulos != comuns + tecnicos:
         raise ValueError(f"Nulos comuns + tecnicos nao conferem com total na linha {linha}")
     if not mapa["nulos_comuns"]:
