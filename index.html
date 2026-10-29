@@ -44,6 +44,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <button type="button" data-tab="turnos" aria-selected="false">1º × 2º turno</button>
 <button type="button" data-tab="estados" aria-selected="false">Estados e exterior</button>
 <button type="button" data-tab="municipios" aria-selected="false">Municípios</button>
+<button type="button" data-tab="participacao" aria-selected="false">Participação e abstenção</button>
 <button type="button" data-tab="entenda" aria-selected="false">Entenda os números</button>
 </nav>
 <div class="filters">
@@ -95,6 +96,28 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 </div>
 <div class="panel"><h3>Desempenho por porte eleitoral</h3><p class="sub">Agrupamos os municípios pela quantidade de votos válidos, e não pela população. Localidades do exterior são analisadas separadamente.</p><div id="sizeChart"></div></div>
 </section>
+<section id="participacao" class="page" hidden>
+<div class="panel">
+<h2>Comparecimento, abstenções, votos brancos e nulos</h2>
+<p class="sub">Selecione o turno e o território nos filtros acima. Abstenção é calculada sobre eleitores aptos; brancos e nulos sobre o comparecimento.</p>
+<div class="stats" id="participationStats"></div>
+<div id="participationBars"></div><div class="tip" id="participationRoundChange"></div>
+</div>
+<div class="cols">
+<div class="panel"><h3>O que ocorreu entre os que compareceram?</h3><div id="ballotComposition"></div><p class="small">Os nulos técnicos já estão incluídos nos votos nulos, sem duplicação.</p></div>
+<div class="panel"><h3>Participação no exterior</h3><div id="participationAbroad"></div></div>
+</div>
+<div class="panel"><h3>Compare os estados e o exterior</h3>
+<div class="tablewrap"><table><thead><tr><th>Local</th><th class="num">Eleitores aptos</th><th class="num">Comparecimento</th><th class="num">Abstenções</th><th class="num">Taxa de abstenção</th><th class="num">Brancos</th><th class="num">Nulos</th></tr></thead><tbody id="participationStates"></tbody></table></div></div>
+<div class="panel"><h3>Busque qualquer município ou localidade no exterior</h3>
+<div class="filters">
+<label class="field" for="participationSearch">Buscar localidade<input id="participationSearch" type="search" placeholder="Ex.: Campinas, Lisboa"></label>
+<label class="field" for="participationOrder">Ordenar por<select id="participationOrder">
+<option value="abst_rate">Maior taxa de abstenção</option><option value="abst_abs">Mais abstenções</option><option value="abst_low">Menor taxa de abstenção</option><option value="null">Mais nulos</option><option value="blank">Mais brancos</option>
+</select></label></div>
+<p class="small" id="participationCityCount"></p>
+<div class="tablewrap"><table><thead><tr><th>UF</th><th>Município/localidade</th><th class="num">Aptos</th><th class="num">Comparecimento</th><th class="num">Abstenções</th><th class="num">Abstenção (%)</th><th class="num">Brancos</th><th class="num">Nulos</th></tr></thead><tbody id="participationCities"></tbody></table></div><p class="small">Exibimos até 100 registros por vez. Use a busca para localizar uma cidade específica.</p></div>
+</section>
 <section id="entenda" class="page" hidden>
 <div class="panel"><h2>O que cada número quer dizer?</h2>
 <div class="definition"><strong>Votos válidos</strong>São os votos computados para os candidatos. Nesta base, são os votos nominais válidos para presidente.</div>
@@ -104,7 +127,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <div class="definition"><strong>Abstenção</strong>Eleitores aptos que não compareceram. Não é um voto.</div>
 <div class="definition"><strong>Voto em branco</strong>O eleitor compareceu e escolheu votar em branco. Não é contabilizado para candidato.</div>
 <div class="definition"><strong>Voto nulo</strong>Voto registrado sem escolha válida de candidato. Também não é transferido para nenhum candidato.</div>
-<div class="tip"><strong>Por que ainda não mostramos números de brancos, nulos e abstenções?</strong> Porque a base de votação por candidato não contém essas informações. Vamos buscar os arquivos oficiais de comparecimento e apuração para incluí-las sem misturar fontes ou inventar valores.</div>
+<div class="definition"><strong>Taxa de abstenção</strong>Abstenções divididas por eleitores aptos. Votos em branco e nulos, quando apresentados em porcentagem, são divididos pelo comparecimento.</div><div class="definition"><strong>Nulos técnicos</strong>Já estão incluídos nos votos nulos da totalização.</div><div class="tip">Na base nacional, há uma diferença técnica de 423 eleitores entre aptos e comparecimento + abstenções em cada turno. Não incluímos essa diferença nas abstenções.</div>
 </div>
 <div class="panel"><h3>Fonte e metodologia</h3><p id="sourceText">Aguardando dados.</p><p><a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Acessar os dados abertos do TSE</a></p><p class="small">Este projeto é independente e não representa uma página oficial do TSE.</p></div>
 </section>
@@ -113,7 +136,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <script>
 (function(){
 "use strict";
-var DATA=null,REGION="ALL",ROUND="1";
+var DATA=null,PART=null,REGION="ALL",ROUND="1",P_NAMES={};
 var UFNAME={AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins",ZZ:"Exterior"};
 var COLORS={"13":"#287eba","22":"#df9039","14":"#0a8865","70":"#9472be","55":"#c15f8b","30":"#668bb2"};
 var $=function(s){return document.querySelector(s);};
@@ -198,8 +221,48 @@ var city=function(){
  var m=data.filter(function(x){return x.uf!=="ZZ";});
  $("#sizeChart").innerHTML=bins.map(function(bin){var list=m.filter(function(x){return x.validos>=bin[1]&&x.validos<=bin[2];}),val=list.reduce(function(a,x){return a+x.validos;},0),num=list.reduce(function(a,x){return a+(x.votos[n]||0);},0);return '<div class="bar-item"><div class="bar-top"><span>'+bin[0]+'</span><strong>'+(val?pct(num/val):"Sem dados")+'</strong></div><div class="track"><div class="barfill" style="width:'+(val?100*num/val:0)+'%;background:'+ccolor(n,0)+'"></div></div><div class="bar-detail">'+fmt(list.length)+' municípios · '+fmt(num)+' votos do candidato</div></div>';}).join("");
 };
+
+var pLocal=function(t,r){
+ if(!PART)return null;
+ if(r==="ALL")return PART.nacional[t];
+ if(r==="ZZ")return PART.exterior[t];
+ if(r==="DOM"){var v={};Object.keys(PART.nacional[t]).forEach(function(k){v[k]=PART.nacional[t][k]-PART.exterior[t][k];});return v;}
+ return PART.estados[t][r]||null;
+};
+var pRate=function(v){return v.aptos?v.abstencoes/v.aptos:0;};
+var pLine=function(name,n,den){return '<div class="row"><span>'+safe(name)+'</span><strong>'+fmt(n)+(den?' · '+pct(n/den):'')+'</strong></div>';};
+var participation=function(){
+ if(!PART)return;
+ var x=pLocal(ROUND,REGION);if(!x)return;
+ var apt=x.aptos||0,compare=x.comparecimento||0;
+ var kpis=[["Eleitores aptos",fmt(apt)],["Comparecimento",fmt(compare)+" · "+pct(apt?compare/apt:0)],["Abstenções",fmt(x.abstencoes)+" · "+pct(pRate(x))],["Brancos",fmt(x.brancos)+" · "+pct(compare?x.brancos/compare:0)],["Nulos",fmt(x.nulos)+" · "+pct(compare?x.nulos/compare:0)],["Votos válidos",fmt(x.validos)+" · "+pct(compare?x.validos/compare:0)]];
+ $("#participationStats").innerHTML=kpis.map(function(k){return '<div class="kpi"><small>'+k[0]+'</small><strong>'+k[1]+'</strong></div>';}).join("");
+ $("#participationBars").innerHTML='<h3>Participação entre eleitores aptos</h3><div class="pairbar"><span style="width:'+(apt?100*compare/apt:0)+'%;background:#087653"></span><span style="width:'+(apt?100*x.abstencoes/apt:0)+'%;background:#df9039"></span></div>'+pLine("Compareceram",compare,apt)+pLine("Abstenções",x.abstencoes,apt);
+ var f=pLocal("1",REGION),g=pLocal("2",REGION),delta=pRate(g)-pRate(f);
+ $("#participationRoundChange").innerHTML='<strong>Do primeiro para o segundo turno:</strong> as abstenções passaram de '+fmt(f.abstencoes)+' ('+pct(pRate(f))+') para '+fmt(g.abstencoes)+' ('+pct(pRate(g))+'). Diferença de '+(g.abstencoes-f.abstencoes>0?"+":g.abstencoes-f.abstencoes<0?"−":"")+fmt(Math.abs(g.abstencoes-f.abstencoes))+' eleitores; '+(delta<0?"queda":delta>0?"aumento":"variação")+' de '+pp(delta)+'. Isso não identifica o comportamento de cada eleitor.';
+ var parts=[["Válidos",x.validos,"#087653"],["Brancos",x.brancos,"#e5af3e"],["Nulos",x.nulos,"#9b688d"]];
+ $("#ballotComposition").innerHTML='<div class="pairbar">'+parts.map(function(z){return '<span style="width:'+(compare?100*z[1]/compare:0)+'%;background:'+z[2]+'"></span>';}).join("")+'</div>'+parts.map(function(z){return pLine(z[0],z[1],compare);}).join("")+(x.nulos_tecnicos?'<p class="small">Total de nulos técnicos: '+fmt(x.nulos_tecnicos)+' (incluídos no total).</p>':'');
+ var e=PART.exterior[ROUND];
+ $("#participationAbroad").innerHTML=pLine("Eleitores aptos",e.aptos)+pLine("Comparecimento",e.comparecimento,e.aptos)+pLine("Abstenções",e.abstencoes,e.aptos)+pLine("Brancos",e.brancos,e.comparecimento)+pLine("Nulos",e.nulos,e.comparecimento);
+ var ufs=Object.keys(PART.estados[ROUND]).filter(function(uf){return REGION==="ALL"||(REGION==="DOM"?uf!=="ZZ":REGION===uf);});
+ $("#participationStates").innerHTML=ufs.map(function(uf){return {uf:uf,v:PART.estados[ROUND][uf]};}).sort(function(a,b){return pRate(b.v)-pRate(a.v);}).map(function(z){var v=z.v;return '<tr><td>'+safe(UFNAME[z.uf]||z.uf)+'</td><td class="num">'+fmt(v.aptos)+'</td><td class="num">'+fmt(v.comparecimento)+'</td><td class="num">'+fmt(v.abstencoes)+'</td><td class="num">'+pct(pRate(v))+'</td><td class="num">'+fmt(v.brancos)+'</td><td class="num">'+fmt(v.nulos)+'</td></tr>';}).join("");
+ participationCity();
+};
+var participationCity=function(){
+ if(!PART)return;
+ var t=ROUND,q=normalize($("#participationSearch").value),o=$("#participationOrder").value;
+ var rows=PART.municipios.filter(function(x){return String(x.turno)===t&&(REGION==="ALL"||(REGION==="DOM"?x.uf!=="ZZ":x.uf===REGION));}).map(function(x){return {uf:x.uf,codigo:x.codigo,aptos:x.aptos,comparecimento:x.comparecimento,abstencoes:x.abstencoes,brancos:x.brancos,nulos:x.nulos,name:P_NAMES[t+"|"+x.uf+"|"+x.codigo]||(x.uf==="ZZ"?"Localidade "+x.codigo:"Município "+x.codigo)};});
+ if(q)rows=rows.filter(function(x){return normalize(x.name+" "+x.uf+" "+x.codigo).includes(q);});
+ rows.sort(function(a,b){
+  var va=o==="abst_abs"?a.abstencoes:o==="null"?a.nulos:o==="blank"?a.brancos:pRate(a);
+  var vb=o==="abst_abs"?b.abstencoes:o==="null"?b.nulos:o==="blank"?b.brancos:pRate(b);
+  return (o==="abst_low"?va-vb:vb-va)||a.uf.localeCompare(b.uf)||a.name.localeCompare(b.name);
+ });
+ $("#participationCityCount").textContent=fmt(rows.length)+" localidades encontradas; mostrando até 100.";
+ $("#participationCities").innerHTML=rows.slice(0,100).map(function(x){return '<tr><td>'+safe(x.uf)+'</td><td>'+safe(x.name)+'</td><td class="num">'+fmt(x.aptos)+'</td><td class="num">'+fmt(x.comparecimento)+'</td><td class="num">'+fmt(x.abstencoes)+'</td><td class="num">'+pct(pRate(x))+'</td><td class="num">'+fmt(x.brancos)+'</td><td class="num">'+fmt(x.nulos)+'</td></tr>';}).join("")||'<tr><td colspan="8">Nenhuma localidade encontrada.</td></tr>';
+};
 function normalize(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
-function render(){if(!DATA)return;summary();duel();roundCompare();states();city();}
+function render(){if(!DATA)return;summary();duel();roundCompare();states();city();participation();}
 function refill(t){
  var sels=["#candA","#candB","#territoryCand","#cityCand"];
  sels.forEach(function(sel){var el=$(sel),old=el.value;el.innerHTML=options(t);if(candidates(t).some(function(c){return c.numero===old;}))el.value=old;});
@@ -213,19 +276,32 @@ $("#region").addEventListener("change",function(){REGION=this.value;render();});
 $("#round").addEventListener("change",function(){ROUND=this.value;refill(ROUND);render();});
 ["#candA","#candB","#territoryCand","#cityCand"].forEach(function(id){$(id).addEventListener("change",render);});
 $("#citySearch").addEventListener("input",city);
-fetch("./dados_eleicao_2026.json",{cache:"no-store"}).then(function(res){if(!res.ok)throw Error("arquivo de dados ainda não publicado (HTTP "+res.status+")");return res.json();}).then(function(d){
- if(!d.candidatos||!d.nacional||!d.estados||!Array.isArray(d.municipios))throw Error("estrutura JSON incompleta");
- ["1","2"].forEach(function(t){var n=total(d.nacional[t]);if(n!==Number(d.totais_conferidos[t]))throw Error("total não confere no turno "+t);});
- DATA=d;var region=$("#region");region.innerHTML='<option value="ALL">Brasil completo (inclui exterior)</option><option value="DOM">Brasil sem exterior (27 UFs)</option><option value="ZZ">Exterior (ZZ)</option>'+Object.keys(d.estados["1"]||{}).filter(function(u){return u!=="ZZ";}).sort().map(function(uf){return'<option value="'+safe(uf)+'">'+safe(UFNAME[uf]||uf)+" ("+uf+")</option>";}).join("");
+$("#participationSearch").addEventListener("input",participationCity);
+$("#participationOrder").addEventListener("change",participationCity);
+Promise.all(["./dados_eleicao_2026.json","./dados_participacao_2026.json"].map(function(url){
+ return fetch(url,{cache:"no-store"}).then(function(res){if(!res.ok)throw Error("falha ao carregar "+url+" (HTTP "+res.status+")");return res.json();});
+})).then(function(arquivos){
+ var d=arquivos[0],p=arquivos[1];
+ if(!d.candidatos||!d.nacional||!d.estados||!Array.isArray(d.municipios))throw Error("estrutura de votos incompleta");
+ if(!p.nacional||!p.estados||!p.exterior||!Array.isArray(p.municipios))throw Error("estrutura de participação incompleta");
+ ["1","2"].forEach(function(t){
+  var n=total(d.nacional[t]);
+  if(n!==Number(d.totais_conferidos[t])||n!==p.nacional[t].validos)throw Error("votos válidos divergentes no turno "+t);
+  var z=p.nacional[t];
+  if(z.comparecimento!==z.validos+z.brancos+z.nulos+z.anulados)throw Error("participação inconsistente no turno "+t);
+ });
+ DATA=d;PART=p;
+ d.municipios.forEach(function(x){P_NAMES[x.turno+"|"+x.uf+"|"+x.codigo]=x.municipio;});
+ var region=$("#region");region.innerHTML='<option value="ALL">Brasil completo (inclui exterior)</option><option value="DOM">Brasil sem exterior (27 UFs)</option><option value="ZZ">Exterior (ZZ)</option>'+Object.keys(d.estados["1"]||{}).filter(function(u){return u!=="ZZ";}).sort().map(function(uf){return'<option value="'+safe(uf)+'">'+safe(UFNAME[uf]||uf)+" ("+uf+")</option>";}).join("");
  ["#region","#round","#candA","#candB","#territoryCand","#cityCand","#citySearch"].forEach(function(sel){$(sel).disabled=false;});
  refill("1");$("#candA").value="13";$("#candB").value="22";$("#territoryCand").value="13";$("#cityCand").value="13";
- $("#notice").innerHTML="<strong>Dados carregados.</strong> Votação presidencial dos dois turnos de 2026, incluindo o exterior. Brancos, nulos e abstenções ainda não estão disponíveis nesta base.";
- $("#verification").textContent="VOTOS VÁLIDOS · DADOS DO TSE · 1º E 2º TURNOS";
- $("#sourceText").textContent="Fonte: "+(d.fonte||"TSE")+". Gerado em: "+(d.gerado_em_utc||"data não informada")+". Totais conferidos: primeiro turno "+fmt(d.totais_conferidos["1"])+" e segundo turno "+fmt(d.totais_conferidos["2"])+". O exterior aparece como ZZ. Esta base não contém votos brancos, nulos nem abstenção.";
+ $("#notice").innerHTML="<strong>Dados carregados e conferidos.</strong> Votação presidencial, comparecimento, abstenções, brancos e nulos dos dois turnos, incluindo o exterior.";
+ $("#verification").textContent="DADOS DO TSE · VOTOS E PARTICIPAÇÃO · 1º E 2º TURNOS";
+ $("#sourceText").textContent="Fontes: "+(d.fonte||"TSE")+" e "+p.fonte+". Totais de votos válidos conferidos: 1º turno "+fmt(d.totais_conferidos["1"])+", 2º turno "+fmt(d.totais_conferidos["2"])+". Exterior: ZZ. Abstenção usa aptos; brancos e nulos usam comparecimento. Diferença técnica de 423 eleitores entre aptos e comparecimento + abstenções em cada turno na base nacional. SHA-256 do arquivo original: "+p.sha256_zip+".";
  render();
 }).catch(function(err){
- $("#notice").innerHTML='<strong>Os gráficos estão prontos, mas o arquivo de dados ainda não foi disponibilizado no GitHub.</strong> Publique <code>dados_eleicao_2026.json</code> na pasta principal do repositório. Detalhe: '+safe(err.message);
- $("#verification").textContent="AGUARDANDO PUBLICAÇÃO DOS DADOS";
+ $("#notice").innerHTML='<strong>Não foi possível carregar ou conciliar os dados eleitorais.</strong> '+safe(err.message);
+ $("#verification").textContent="VERIFIQUE OS ARQUIVOS DE DADOS";
 });
 })();
 </script>
