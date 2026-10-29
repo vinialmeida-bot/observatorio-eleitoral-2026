@@ -69,6 +69,26 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 .qa-footer{border:1px solid var(--line);border-radius:9px;background:#f7faf8;padding:15px;font-size:.84rem;color:var(--muted)}
 .explain-plain{background:#ecf6ef;border-radius:9px;padding:12px 14px;font-size:.96rem}
 @media(max-width:680px){.qa-search-line{display:block}.qa-search-line input{margin-top:10px}.qa-card summary{padding:14px 12px;gap:8px}.qa-index{width:33px;height:33px;flex-basis:33px}.qa-answer{padding:14px}.qa-stats{grid-template-columns:1fr}.qa-question strong{font-size:1rem}}
+.qa-city{background:#fff;border:1px solid #c9e2d5;padding:22px;border-radius:14px;margin:0 0 18px;box-shadow:0 2px 8px #17482d0a}
+.qa-city-top h3{margin:0 0 6px;font-size:1.3rem}
+.qa-city-top p{margin:4px 0 13px;max-width:760px;color:#526e61}
+.qa-city-top label{display:block;font-weight:750;font-size:.88rem;margin:15px 0 7px;color:#385d4c}
+.qa-city-top input{display:block;width:100%;max-width:650px}
+.qa-muted{font-size:.88rem;color:#5c7868}
+.qa-city-suggestions{display:grid;max-width:650px;margin:7px 0;gap:3px}
+.qa-city-suggestions button{border:1px solid #dce8e1;background:#fff;border-radius:7px;display:flex;justify-content:space-between;gap:10px;padding:11px 12px;text-align:left;align-items:center;color:#234939}
+.qa-city-suggestions button:hover,.qa-city-suggestions button:focus-visible{background:#e9f5ee;border-color:#8bbca2}
+.qa-city-suggestions small{color:#577666;white-space:nowrap}
+.qa-city-profile{border-top:1px solid #d8e7dc;padding-top:16px;margin-top:14px}
+.qa-city-profile-title{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.qa-city-profile-title strong{font-size:1.08rem}
+.qa-city-reset,.qa-share{border:1px solid #93b9a4;background:#fff;color:#086247;border-radius:8px;padding:8px 12px;font-size:.86rem;font-weight:700}
+.qa-city-profile .qa-lead{color:#1e533d;font-size:1.08rem;font-weight:600}
+.qa-city-disclaimer{font-size:.85rem;color:#557469}
+.qa-share{margin:12px 0 0}
+.qa-share-status{background:#e9f5ec;padding:10px;border-radius:8px;margin:10px 0;font-size:.87rem}
+.qa-share-status:empty{display:none}
+@media(max-width:680px){.qa-city{padding:15px}.qa-city-suggestions button{padding:12px}.qa-city-profile .qa-stats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -86,7 +106,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <button type="button" data-tab="duelo" aria-selected="false">Dois candidatos</button>
 <button type="button" data-tab="turnos" aria-selected="false">O que mudou?</button>
 <button type="button" data-tab="estados" aria-selected="false">Estados e exterior</button>
-<button type="button" data-tab="municipios" aria-selected="false">Minha cidade</button>
+<button type="button" data-tab="municipios" aria-selected="false">Tabela de municípios</button>
 <button type="button" data-tab="participacao" aria-selected="false">Quem votou e quem faltou?</button>
 <button type="button" data-tab="entenda" aria-selected="false">Palavras explicadas</button>
 </nav>
@@ -98,7 +118,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <select id="round" disabled><option value="1">Primeiro turno</option><option value="2">Segundo turno</option></select>
 </label>
 </div>
-<section id="perguntas" class="page"><div id="qaArea"><div class="panel"><h2>Preparando respostas com os números do TSE…</h2></div></div></section>
+<section id="perguntas" class="page"><div id="qaCity" class="qa-city"><div class="panel">Preparando busca de municípios…</div></div><div id="qaArea"><div class="panel"><h2>Preparando respostas com os números do TSE…</h2></div></div></section>
 <section id="panorama" class="page" hidden>
 <div class="panel"><h2>Quem recebeu mais votos?</h2><p class="sub">Cada barra mostra os votos de um candidato. A porcentagem é calculada apenas sobre os votos válidos do local e turno escolhidos.</p>
 <div class="stats" id="overviewStats"></div>
@@ -179,6 +199,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 </section>
 </main>
 <footer>Observatório Eleitoral 2026 · Análise de dados públicos · Resultados sem recomendação ou preferência por candidatos.</footer>
+<script src="./cidade.js"></script>
 <script src="./perguntas.js"></script>
 <script>
 (function(){
@@ -311,7 +332,14 @@ var participationCity=function(){
  $("#participationCities").innerHTML=rows.slice(0,100).map(function(x){return '<tr><td>'+safe(x.uf)+'</td><td>'+safe(x.name)+'</td><td class="num">'+fmt(x.aptos)+'</td><td class="num">'+fmt(x.comparecimento)+'</td><td class="num">'+fmt(x.abstencoes)+'</td><td class="num">'+pct(pRate(x))+'</td><td class="num">'+fmt(x.brancos)+'</td><td class="num">'+fmt(x.nulos)+'</td></tr>';}).join("")||'<tr><td colspan="8">Nenhuma localidade encontrada.</td></tr>';
 };
 function normalize(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
-function render(){if(!DATA)return;summary();duel();roundCompare();states();city();participation();if(PART&&window.ObsPerguntas)window.ObsPerguntas.render({votos:DATA,participacao:PART,regiao:REGION});}
+function render(){
+ if(!DATA)return;
+ summary();duel();roundCompare();states();city();participation();
+ if(PART&&window.ObsCidade){
+  window.ObsCidade.init({votos:DATA,participacao:PART,aoSelecionar:render});
+ }
+ if(PART&&window.ObsPerguntas)window.ObsPerguntas.render({votos:DATA,participacao:PART,regiao:REGION,cidade:window.ObsCidade?window.ObsCidade.selected():null});
+}
 function refill(t){
  var sels=["#candA","#candB","#territoryCand","#cityCand"];
  sels.forEach(function(sel){var el=$(sel),old=el.value;el.innerHTML=options(t);if(candidates(t).some(function(c){return c.numero===old;}))el.value=old;});
