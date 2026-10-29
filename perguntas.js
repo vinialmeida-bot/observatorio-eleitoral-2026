@@ -55,7 +55,7 @@
   var lookup=normal(question+" "+short+" "+terms);
   var linked=global.location?new URL(global.location.href).searchParams.get("pergunta"):null;
   opened=opened||linked===id;
-  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<p class="qa-source">Fonte dos dados: <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Tribunal Superior Eleitoral (TSE)</a>. Compare os números com a metodologia indicada acima.</p><button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button></div></details></article>';
+  return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<p class="qa-source">Fonte dos dados: <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Tribunal Superior Eleitoral (TSE)</a>. Compare os números com a metodologia indicada acima.</p><button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button><span class="qa-share-feedback" role="status" aria-live="polite"></span></div></details></article>';
  }
 
  function make(){
@@ -194,10 +194,11 @@
   var c=document.getElementById("qaCount");
   if(c)c.textContent=shown===cards.length?"10 perguntas respondidas com dados":fmt(shown)+" pergunta(s) encontrada(s)";
  }
- function share(id){
+ function share(id,button){
   if(!global.location)return;
   var url=new URL(global.location.href);url.searchParams.set("pergunta",id);
-  var link=url.toString(),status=document.getElementById("qaShareStatus");
+  if(!city){if(region==="ALL")url.searchParams.delete("regiao");else url.searchParams.set("regiao",region);}
+  var link=url.toString(),status=button?button.nextElementSibling:document.getElementById("qaShareStatus");
   function fallback(){
    if(status)status.innerHTML='Copie este link: <a href="'+safe(link)+'">'+safe(link)+'</a>';
   }
@@ -213,7 +214,7 @@
   });
   target.addEventListener("click",function(ev){
    var btn=ev.target.closest("[data-qa-share]");
-   if(btn)share(btn.getAttribute("data-qa-share"));
+   if(btn)share(btn.getAttribute("data-qa-share"),btn);
   });
   target.addEventListener("change",function(ev){
    if(ev.target.id==="qaCandidate"){
