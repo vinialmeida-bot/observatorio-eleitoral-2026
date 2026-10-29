@@ -88,6 +88,8 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 .qa-share{margin:12px 0 0}
 .qa-share-status{background:#e9f5ec;padding:10px;border-radius:8px;margin:10px 0;font-size:.87rem}
 .qa-share-status:empty{display:none}
+.qa-share-feedback{display:block;margin:5px 0 0;color:#246146;font-size:.84rem;overflow-wrap:anywhere}
+.qa-source{font-size:.82rem;color:#567467;border-top:1px solid #e6eeea;padding-top:10px;overflow-wrap:anywhere}
 @media(max-width:680px){.qa-city{padding:15px}.qa-city-suggestions button{padding:12px}.qa-city-profile .qa-stats{grid-template-columns:1fr}}
 .nav-more{border:1px solid #d7e6dc;border-radius:9px;background:#fff;flex:1 0 100%}
 .nav-more summary{list-style:none;padding:10px 14px;font-weight:700;cursor:pointer;color:#186047;font-size:.9rem}
@@ -362,7 +364,14 @@ document.querySelectorAll("nav [data-tab]").forEach(function(btn){btn.addEventLi
  document.querySelectorAll("nav [data-tab]").forEach(function(el){el.setAttribute("aria-selected",String(el===btn));});
  document.querySelectorAll("section.page").forEach(function(el){el.hidden=el.id!==btn.dataset.tab;});
  });});
-$("#region").addEventListener("change",function(){REGION=this.value;render();});
+$("#region").addEventListener("change",function(){
+ REGION=this.value;
+ var url=new URL(window.location.href);
+ if(REGION==="ALL")url.searchParams.delete("regiao");else url.searchParams.set("regiao",REGION);
+ url.searchParams.delete("pergunta");
+ window.history.replaceState(null,"",url.pathname+url.search+url.hash);
+ render();
+});
 $("#round").addEventListener("change",function(){ROUND=this.value;refill(ROUND);render();});
 ["#candA","#candB","#territoryCand","#cityCand"].forEach(function(id){$(id).addEventListener("change",render);});
 $("#citySearch").addEventListener("input",city);
@@ -384,6 +393,8 @@ Promise.all(["./dados_eleicao_2026.json","./dados_participacao_2026.json"].map(f
  d.municipios.forEach(function(x){P_NAMES[x.turno+"|"+x.uf+"|"+x.codigo]=x.municipio;});
  var region=$("#region");region.innerHTML='<option value="ALL">Brasil completo (inclui exterior)</option><option value="DOM">Brasil sem exterior (27 UFs)</option><option value="ZZ">Exterior (ZZ)</option>'+Object.keys(d.estados["1"]||{}).filter(function(u){return u!=="ZZ";}).sort().map(function(uf){return'<option value="'+safe(uf)+'">'+safe(UFNAME[uf]||uf)+" ("+uf+")</option>";}).join("");
  ["#region","#round","#candA","#candB","#territoryCand","#cityCand","#citySearch"].forEach(function(sel){$(sel).disabled=false;});
+ var fromLink=new URL(window.location.href).searchParams.get("regiao");
+ if(fromLink&&Array.from(region.options).some(function(opt){return opt.value===fromLink;})){REGION=fromLink;region.value=fromLink;}
  refill("1");$("#candA").value="13";$("#candB").value="22";$("#territoryCand").value="13";$("#cityCand").value="13";
  $("#notice").innerHTML="<strong>Dados carregados.</strong> Comece pelas perguntas respondidas ou escolha o lugar que deseja conhecer. Todos os números são do TSE.";
  $("#verification").textContent="DADOS DO TSE · VOTOS E PARTICIPAÇÃO · 1º E 2º TURNOS";
