@@ -53,6 +53,8 @@
  }
  function card(id,num,question,short,content,terms,opened){
   var lookup=normal(question+" "+short+" "+terms);
+  var linked=global.location?new URL(global.location.href).searchParams.get("pergunta"):null;
+  opened=opened||linked===id;
   return '<article class="qa-card" data-qa-search="'+safe(lookup)+'"><details data-qa-id="'+safe(id)+'"'+(opened?' open':'')+'><summary><span class="qa-index">'+num+'</span><span class="qa-question"><strong>'+safe(question)+'</strong><small>'+safe(short)+'</small></span><span class="qa-chevron" aria-hidden="true">⌄</span></summary><div class="qa-answer">'+content+'<button type="button" class="qa-share" data-qa-share="'+safe(id)+'" aria-label="Compartilhar esta resposta">Compartilhar esta resposta</button></div></details></article>';
  }
 
@@ -181,7 +183,7 @@
   cards.push(card("fraude","10","Uma virada nos números prova fraude?",
      "Não. É necessário analisar evidências concretas, não apenas a mudança dos totais.",q10,"fraude suspeita irregularidade apuração seguranca auditoria",aa.fraude));
   var header='<div class="qa-intro"><p class="qa-overline">COMECE POR AQUI</p><h2>As perguntas que muita gente faz sobre a eleição</h2><p>Você não precisa entender gráficos. Abra uma pergunta, leia a resposta e veja os números que a sustentam. Quando não há como saber algo, explicamos isso também.</p><div class="qa-selected"><strong>Onde estamos olhando:</strong> '+safe(localName)+' <span>Use o filtro de território acima para comparar outro local.</span></div></div>';
-  return header+'<div class="qa-search-line"><label for="qaSearch"><strong>Procurar uma pergunta</strong><span>Ex.: virada, abstenção, Caiado, exterior</span></label><input type="search" id="qaSearch" placeholder="Digite uma palavra ou assunto" autocomplete="off"></div><p class="qa-count" id="qaCount"></p><div id="qaAnswers">'+cards.join("")+'</div><p class="qa-footer">Todas as respostas numéricas são recalculadas a partir dos arquivos oficiais do TSE. As perguntas resumem debates públicos; nenhum resultado é atribuído a comportamento individual sem evidência. <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Conferir dados originais do TSE</a>.</p>';
+  return header+'<div class="qa-search-line"><label for="qaSearch"><strong>Procurar uma pergunta</strong><span>Ex.: virada, abstenção, Caiado, exterior</span></label><input type="search" id="qaSearch" placeholder="Digite uma palavra ou assunto" autocomplete="off" value="'+safe(state.questionSearch)+'"></div><p class="qa-count" id="qaCount"></p><div id="qaAnswers">'+cards.join("")+'</div><p class="qa-share-status" id="qaShareStatus" role="status" aria-live="polite"></p><p class="qa-footer">Todas as respostas numéricas são recalculadas a partir dos arquivos oficiais do TSE. As perguntas resumem debates públicos; nenhum resultado é atribuído a comportamento individual sem evidência. <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" target="_blank" rel="noopener noreferrer">Conferir dados originais do TSE</a>.</p>';
  }
  function filter(){
   var input=document.getElementById("qaSearch"),q=normal(input?input.value:""),cards=document.querySelectorAll("#qaAnswers .qa-card"),shown=0;
@@ -189,14 +191,42 @@
   var c=document.getElementById("qaCount");
   if(c)c.textContent=shown===cards.length?"10 perguntas respondidas com dados":fmt(shown)+" pergunta(s) encontrada(s)";
  }
+ function share(id){
+  if(!global.location)return;
+  var url=new URL(global.location.href);url.searchParams.set("pergunta",id);
+  var link=url.toString(),status=document.getElementById("qaShareStatus");
+  function fallback(){
+   if(status)status.innerHTML='Copie este link: <a href="'+safe(link)+'">'+safe(link)+'</a>';
+  }
+  if(global.navigator&&global.navigator.clipboard&&global.navigator.clipboard.writeText){
+   global.navigator.clipboard.writeText(link).then(function(){if(status)status.textContent="Link copiado! Você pode compartilhar esta explicação.";}).catch(fallback);
+  }else fallback();
+ }
  function bind(){
   var target=document.getElementById("qaArea");if(!target||target.dataset.bound)return;
   target.dataset.bound="1";
-  target.addEventListener("input",function(ev){if(ev.target.id==="qaSearch")filter();});
-  target.addEventListener("change",function(ev){if(ev.target.id==="qaCandidate"){state.candidate=ev.target.value;var q=document.getElementById("qaSearch"),prev=q?q.value:"";draw();var fresh=document.getElementById("qaSearch");if(fresh)fresh.value=prev;filter();}});
+  target.addEventListener("input",function(ev){
+   if(ev.target.id==="qaSearch"){state.questionSearch=ev.target.value;filter();}
+  });
+  target.addEventListener("click",function(ev){
+   var btn=ev.target.closest("[data-qa-share]");
+   if(btn)share(btn.getAttribute("data-qa-share"));
+  });
+  target.addEventListener("change",function(ev){
+   if(ev.target.id==="qaCandidate"){
+    state.candidate=ev.target.value;draw();
+   }
+  });
  }
- function draw(){var area=document.getElementById("qaArea");if(!area||!data||!part)return;area.innerHTML=make();state.rendered=true;filter();}
+ function draw(){
+  var area=document.getElementById("qaArea");if(!area||!data||!part)return;
+  area.innerHTML=make();state.rendered=true;filter();
+ }
  global.ObsPerguntas={
-  render:function(ctx){data=ctx.votos;part=ctx.participacao;region=ctx.regiao||"ALL";bind();draw();}
+  render:function(ctx){
+   data=ctx.votos;part=ctx.participacao;region=ctx.regiao||"ALL";city=ctx.cidade||null;
+   bind();draw();
+  }
  };
+
 })(window);
