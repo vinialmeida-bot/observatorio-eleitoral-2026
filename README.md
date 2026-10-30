@@ -13,7 +13,8 @@ O Observatório é um projeto independente, gratuito e aberto para explicar a el
 3. Leia o resumo da sua cidade: quem esteve à frente entre Lula e Flávio no 1º e no 2º turno, se houve virada e o que aconteceu com o comparecimento.
 4. Abra uma das dez perguntas para ver **a resposta curta, os números e o que eles não provam**. Use **Compartilhar esta resposta** para copiar um link direto, incluindo a cidade escolhida.
 5. Abra **Entre Dados e Achismos** para explorar os seis estudos: mudança entre turnos, votos dos eliminados, abstenções, brancos e nulos, apoios políticos e bolhas eleitorais.
-6. Para pesquisar o Brasil ou um estado, clique em **Limpar cidade** e use o filtro geral no alto da página. Outras análises estão no menu **Mais consultas e explicações**.
+6. Abra **Gráficos sob análise** para investigar mapas e postagens de redes sociais: o primeiro estudo compara diferentes definições de crescimento municipal e mostra quando ambos os candidatos cresceram no mesmo local.
+7. Para pesquisar o Brasil ou um estado, clique em **Limpar cidade** e use o filtro geral no alto da página. Outras análises estão no menu **Mais consultas e explicações**.
 
 A busca de perguntas serve para **filtrar as dez perguntas publicadas**, não funciona como chatbot e não produz respostas novas a qualquer pergunta. A busca de cidades usa dados carregados localmente no navegador: o site não solicita cadastro, nome do eleitor, endereço ou preferências políticas.
 
@@ -25,6 +26,7 @@ Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada` ou `?regi
 
 - **Perguntas e minha cidade**: busca por município/localidade do exterior, resumo em português simples e dez perguntas auditáveis sobre a mudança no saldo de votos, viradas municipais, comparecimento, abstenção, votos brancos e nulos, candidatos eliminados, estados e exterior. Cada pergunta tem link próprio compartilhável.
 - **Entre Dados e Achismos**: seis cases independentes e adaptáveis ao território selecionado. Cada estudo traz afirmação investigada, indicadores, visualização, conclusão sobre a evidência, limites e fonte; compartilhe links como `?regiao=SC&case=abstencoes`.
+- **Gráficos sob análise**: estudo 07 sobre o mapa vermelho/azul das redes sociais, com alternância entre votos absolutos e pontos percentuais, comparação entre crescimento simultâneo ou quem cresceu mais, distribuição por UF e busca de municípios. Link compartilhável `?grafico=crescimento`.
 - **Resultado explicado**: quem recebeu mais votos e o que significa a porcentagem apresentada.
 - **Dois candidatos**: comparação das quantidades e das porcentagens.
 - **O que mudou?**: primeiro versus segundo turno.
@@ -40,6 +42,7 @@ Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada` ou `?regi
 - Não explicamos motivações psicológicas, sociais, políticas ou intenções individuais apenas a partir de totais municipais. Os votos são secretos.
 - Uma associação territorial não prova que um eleitor transferiu voto para determinado candidato nem que um apoio político causou votos.
 - Os quatro rótulos de evidência (sustentada, contradita, parcialmente sustentada e inconclusiva) descrevem exclusivamente a afirmação investigada, nunca a qualidade ou o mérito de um candidato. Os cases são apresentados com critérios explícitos, sem avaliação política.
+- O estudo do mapa não reproduz a metodologia de uma publicação de terceiros quando ela não foi divulgada. A contagem municipal considera as 27 UFs, exclui o exterior e apenas compara locais com votos válidos nos dois turnos. Colorações exclusivas por município e crescimento simultâneo são métricas distintas; uma distribuição de cores isolada não é teste de anomalia estatística.
 - Cenários de abstenção são cálculos contrafactuais ilustrativos, e não projeções de voto. A base não contém histórico de declarações de apoio nem amostra de comentários de rede social: por isso não atribuímos causalidade política ou sentimento coletivo.
 - Para "virada municipal", comparamos a liderança **entre Lula e Flávio em ambos os turnos**; só contamos troca efetiva de liderança, excluindo empates. Os resultados do exterior são contados separadamente quando pertinente.
 - "Maior virada" pode significar mais votos de diferença, ou maior variação percentual. O ranking mostra os critérios separadamente. Se a cidade estiver selecionada, a comparação por tamanho absoluto e proporcional é feita com as demais localidades do mesmo estado.
@@ -52,6 +55,7 @@ Um link compartilhado pode conter `?municipio=SC-1234&pergunta=virada` ou `?regi
 | `index.html` | Interface acessível em navegador e hospedada pelo GitHub Pages |
 | `cidade.js` | Busca de municípios/localidades, narrativa de cada local e leitura de links compartilháveis |
 | `cases.js` | Seis cases “Entre Dados e Achismos” e leituras calculadas diretamente no navegador |
+| `mapa.js` | Estudo 07 sobre a interpretação de mapas eleitorais e critérios de crescimento municipal |
 | `perguntas.js` | Motor das dez perguntas automáticas, respostas municipais e compartilhamento de explicações |
 | `dados_eleicao_2026.json` | Votos nominais válidos por candidato, turno, estado, município e exterior |
 | `dados_participacao_2026.json` | Aptos, comparecimento, abstenção, brancos, nulos e válidos |
