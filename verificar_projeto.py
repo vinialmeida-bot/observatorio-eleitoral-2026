@@ -33,9 +33,14 @@ def conferir():
     votos = carregar("dados_eleicao_2026.json")
     part = carregar("dados_participacao_2026.json")
     html = arquivo("index.html").read_text(encoding="utf-8")
-    for nome in ("cidade.js", "perguntas.js"):
+    for nome in ("cidade.js", "perguntas.js", "cases.js"):
         arquivo(nome)
         assert f'./{nome}' in html, f"O site nao carrega {nome}"
+    cases = arquivo("cases.js").read_text(encoding="utf-8")
+    assert "window.ObsCases.render" in html, "O site nao executa o motor dos cases"
+    assert 'data-tab="cases"' in html, "A aba dos cases nao esta no menu"
+    for case_id in ("virada", "transferencia", "abstencoes", "brancos-nulos", "apoios", "bolhas"):
+        assert f'card("{case_id}"' in cases, f"Case nao implementado: {case_id}"
     a = {chave(x): x for x in votos["municipios"]}
     b = {chave(x): x for x in part["municipios"]}
     assert len(a) == len(votos["municipios"]), "Locais repetidos na base de votos"
