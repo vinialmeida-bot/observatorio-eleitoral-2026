@@ -99,6 +99,40 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 .nav-more-content{display:flex;gap:7px;flex-wrap:wrap;padding:8px 10px 12px;border-top:1px solid #e0ece5}
 .nav-more-content button{background:#f4f9f6}
 @media(max-width:680px){.nav-more{grid-column:1/-1}.nav-more-content{display:grid;grid-template-columns:1fr 1fr}.nav-more-content button{width:100%;min-width:0}}
+
+/* Seis estudos — Entre Dados e Achismos */
+.case-intro{background:linear-gradient(120deg,#e8f5ed,#f8fcfa);border:1px solid #bdddc9;padding:clamp(18px,3.7vw,28px);border-radius:14px;margin-bottom:13px}
+.case-intro h2{font-size:clamp(1.5rem,3vw,2.12rem);color:#174e38}
+.case-intro p{max-width:900px}
+.case-kicker{font-size:.77rem;font-weight:800;letter-spacing:.1em;color:#076447}
+.case-scope{padding:10px 13px;background:#fff;border-radius:8px;border:1px solid #d9e9dd;font-size:.9rem}
+.case-help,.case-method-global{background:#fff;border:1px solid #dce7df;border-left:4px solid #087653;border-radius:8px;padding:13px 15px;margin-bottom:13px;font-size:.89rem}
+.case-method-global{margin-top:16px;border-left-color:#e0b14c}
+.case-card{border:1px solid #d8e5dc;background:#fff;border-radius:12px;margin:11px 0;overflow:hidden;box-shadow:0 2px 7px #17452f09}
+.case-card summary{display:flex;gap:12px;align-items:center;padding:17px;list-style:none;cursor:pointer}
+.case-card summary:hover{background:#f5faf7}
+.case-card summary::-webkit-details-marker{display:none}
+.case-number{flex:none;width:38px;height:38px;display:grid;place-items:center;background:#e4f2e8;color:#075a3e;border-radius:9px;font-weight:800}
+.case-heading{display:grid;gap:4px;flex:1;min-width:0}.case-heading strong{font-size:1.08rem}.case-heading small{color:#526c5c;font-size:.88rem;line-height:1.35}
+.case-chevron{color:#087653;font-size:1.45rem}.case-card details[open] .case-chevron{transform:rotate(180deg)}
+.case-content{padding:17px 22px 20px;border-top:1px solid #e6eee9;line-height:1.65}
+.case-content h3{font-size:1rem;margin:18px 0 10px}
+.case-lead{font-size:1.07rem;color:#1f533d;font-weight:600}
+.case-verdict{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center;background:#f1f6f3;padding:10px 13px;border-radius:8px;font-size:.9rem}
+.case-verdict>span{font-weight:800;color:#124c38}.case-verdict small{flex:1 0 100%;color:#557066}
+.case-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}
+.case-stat{padding:13px;background:#eff6f1;border-radius:9px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.case-stat span{font-size:.83rem;color:#4d6959}.case-stat strong{font-size:clamp(1rem,2vw,1.4rem);overflow-wrap:anywhere}
+.case-stat small{color:#537365;font-size:.79rem}
+.case-bars{display:grid;gap:12px;margin:13px 0}.case-bar-head{display:flex;justify-content:space-between;gap:12px;font-size:.87rem}
+.case-bar-head strong{text-align:right;font-variant-numeric:tabular-nums}
+.case-track{height:13px;border-radius:7px;background:#eaf0ed;overflow:hidden}.case-track span{display:block;height:100%;border-radius:7px}
+.case-boundary{border-left:4px solid #e4b950;background:#fff8e9;border-radius:6px;padding:11px 13px}
+.case-method,.case-source{font-size:.86rem;color:#557063}
+.case-source{border-top:1px solid #e5ede8;padding-top:11px}
+.case-share{border:1px solid #8db19f;background:#fff;color:#086247;border-radius:8px;padding:9px 12px;font-weight:700;margin-top:6px}
+.case-feedback{font-size:.82rem;color:#275c44;padding-left:11px;overflow-wrap:anywhere}
+@media(max-width:680px){.case-stats{grid-template-columns:1fr}.case-card summary{padding:13px;gap:9px}.case-content{padding:14px}.case-heading strong{font-size:1rem}.case-bar-head{font-size:.79rem}}
 </style>
 </head>
 <body>
@@ -112,6 +146,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <div class="notice" id="notice" role="status">Carregando a base de resultados...</div>
 <nav aria-label="Seções do observatório">
 <button type="button" data-tab="perguntas" aria-selected="true">Perguntas e minha cidade</button>
+<button type="button" data-tab="cases" aria-selected="false">Entre Dados e Achismos</button>
 <button type="button" data-tab="panorama" aria-selected="false">Resultado explicado</button>
 <button type="button" data-tab="participacao" aria-selected="false">Comparecimento e abstenção</button>
 <details class="nav-more">
@@ -134,6 +169,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 </label>
 </div>
 <section id="perguntas" class="page"><div id="qaCity" class="qa-city"><div class="panel">Preparando busca de municípios…</div></div><div id="qaArea"><div class="panel"><h2>Preparando respostas com os números do TSE…</h2></div></div></section>
+<section id="cases" class="page" hidden><div id="casesArea" aria-live="polite"><div class="panel"><h2>Preparando os seis estudos…</h2></div></div></section>
 <section id="panorama" class="page" hidden>
 <div class="panel"><h2>Quem recebeu mais votos?</h2><p class="sub">Cada barra mostra os votos de um candidato. A porcentagem é calculada apenas sobre os votos válidos do local e turno escolhidos.</p>
 <div class="stats" id="overviewStats"></div>
@@ -216,6 +252,7 @@ nav{display:flex;flex-wrap:wrap;gap:6px;margin:17px 0}nav button{border:1px soli
 <footer>Observatório Eleitoral 2026 · Análise de dados públicos · Resultados sem recomendação ou preferência por candidatos.</footer>
 <script src="./cidade.js"></script>
 <script src="./perguntas.js"></script>
+<script src="./cases.js"></script>
 <script>
 (function(){
 "use strict";
@@ -354,6 +391,7 @@ function render(){
   window.ObsCidade.init({votos:DATA,participacao:PART,aoSelecionar:render});
  }
  if(PART&&window.ObsPerguntas)window.ObsPerguntas.render({votos:DATA,participacao:PART,regiao:REGION,cidade:window.ObsCidade?window.ObsCidade.selected():null});
+  if(PART&&window.ObsCases)window.ObsCases.render({votos:DATA,participacao:PART,regiao:REGION,cidade:window.ObsCidade?window.ObsCidade.selected():null});
 }
 function refill(t){
  var sels=["#candA","#candB","#territoryCand","#cityCand"];
