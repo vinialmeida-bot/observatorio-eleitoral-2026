@@ -65,7 +65,7 @@ function render(ctx){
  items.push(card("virada",1,"A mudança entre os turnos","Por que a diferença de votos mudou?","O que podemos medir é a mudança da vantagem entre os candidatos — não o motivo individual de cada voto.",
   assessment(m1!==m2?"Sustentada pelos dados":"Não observada no recorte","Afirmação examinada: houve mudança no saldo Lula menos Flávio entre os turnos.")+
   '<p><strong>'+esc(changeLabel)+'</strong> No primeiro turno, a diferença Lula menos Flávio foi '+signed(m1)+' votos; no segundo, '+signed(m2)+'. Isso representa uma alteração de '+signed(deltaSaldo)+' votos na diferença.</p>'+
-  stats([stat("Saldo no 1º turno",signed(m1),lado(m1)+" à frente se não houve empate"),stat("Saldo no 2º turno",signed(m2),lado(m2)+" à frente se não houve empate"),stat("Variação da diferença",signed(deltaSaldo),pp(change)+" na distância dos percentuais")])+
+  stats([stat("Saldo no 1º turno",signed(m1),m1===0?"Empate":lado(m1)+" à frente"),stat("Saldo no 2º turno",signed(m2),m2===0?"Empate":lado(m2)+" à frente"),stat("Variação da diferença",signed(deltaSaldo),pp(change)+" na distância dos percentuais")])+
   boxTitle("Votos dos dois finalistas no 2º turno")+
   bars([{label:"Lula",value:num(v2["13"]),color:"#287eba"},{label:"Flávio",value:num(v2["22"]),color:"#df9039"}])+
   boundary("Essas diferenças não identificam quem mudou de candidato, quem passou a votar ou o que motivou a escolha.")));
@@ -117,12 +117,13 @@ function render(ctx){
  var lua=selectedMun.filter(function(x){return x.m2>0;}).length,flav=selectedMun.filter(function(x){return x.m2<0;}).length,eq=selectedMun.filter(function(x){return x.m2===0;}).length;
  var all2=D.nacional["2"],nat13=100*num(all2["13"])/total(all2),nat22=100*num(all2["22"])/total(all2);
  var loc13=total(v2)?100*num(v2["13"])/total(v2):0,loc22=total(v2)?100*num(v2["22"])/total(v2):0;
- var compareLocal=c?'<p>Na localidade '+esc(name)+', Lula obteve '+percent(loc13)+' dos votos válidos e Flávio, '+percent(loc22)+' no segundo turno. No Brasil completo, os percentuais foram '+percent(nat13)+' e '+percent(nat22)+', respectivamente.</p>':
+ var isLocal=Boolean(c)||r==="ZZ";
+ var compareLocal=isLocal?'<p>No recorte '+esc(name)+', Lula obteve '+percent(loc13)+' dos votos válidos e Flávio, '+percent(loc22)+' no segundo turno. No Brasil completo, os percentuais foram '+percent(nat13)+' e '+percent(nat22)+', respectivamente.</p>':
  '<p>Entre os '+fmt(selectedMun.length)+' municípios comparáveis neste recorte, Lula esteve à frente de Flávio em '+fmt(lua)+', Flávio esteve à frente em '+fmt(flav)+' e houve '+fmt(eq)+' empates. Contar municípios não é o mesmo que contar votos: cada município tem um eleitorado de tamanho diferente.</p>';
  items.push(card("bolhas",6,"A bolha eleitoral","Se na minha cidade muitos votaram em um candidato, por que o país teve outro resultado?","A experiência local pode ser verdadeira sem representar o conjunto dos eleitores brasileiros.",
   assessment("Contradita como inferência estatística","Afirmação examinada: o resultado da minha cidade ou do meu círculo de conhecidos representa automaticamente o resultado nacional.")+
   compareLocal+
-  stats([stat(c?"Lula na localidade":"Municípios à frente: Lula",c?percent(loc13):fmt(lua)),stat(c?"Flávio na localidade":"Municípios à frente: Flávio",c?percent(loc22):fmt(flav)),stat("Votação Lula no Brasil",percent(nat13),"Segundo turno, todos os votos válidos")])+
+  stats([stat(isLocal?"Lula no recorte":"Municípios à frente: Lula",isLocal?percent(loc13):fmt(lua)),stat(isLocal?"Flávio no recorte":"Municípios à frente: Flávio",isLocal?percent(loc22):fmt(flav)),stat("Votação Lula no Brasil",percent(nat13),"Segundo turno, todos os votos válidos")])+
   bars([{label:"Brasil — Lula (votos válidos)",value:num(all2["13"]),color:"#287eba"},{label:"Brasil — Flávio (votos válidos)",value:num(all2["22"]),color:"#df9039"}])+
   '<p class="case-method">As contagens municipais consideram as 27 UFs, excluindo o exterior. A liderança entre os dois finalistas é calculada por município. Os percentuais nacionais incluem exterior.</p>'+
   boundary("A eleição não revela as preferências de amigos e familiares, nem autoriza tratar uma amostra pessoal ou uma cidade como representativa do Brasil inteiro.")));
