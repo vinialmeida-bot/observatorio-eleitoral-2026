@@ -33,7 +33,7 @@ def conferir():
     votos = carregar("dados_eleicao_2026.json")
     part = carregar("dados_participacao_2026.json")
     html = arquivo("index.html").read_text(encoding="utf-8")
-    for nome in ("cidade.js", "perguntas.js", "cases.js"):
+    for nome in ("cidade.js", "perguntas.js", "cases.js", "mapa.js"):
         arquivo(nome)
         assert f'./{nome}' in html, f"O site nao carrega {nome}"
     cases = arquivo("cases.js").read_text(encoding="utf-8")
@@ -41,6 +41,10 @@ def conferir():
     assert 'data-tab="cases"' in html, "A aba dos cases nao esta no menu"
     for case_id in ("virada", "transferencia", "abstencoes", "brancos-nulos", "apoios", "bolhas"):
         assert f'card("{case_id}"' in cases, f"Case nao implementado: {case_id}"
+    mapa_script = arquivo("mapa.js").read_text(encoding="utf-8")
+    assert "window.ObsMapa.render" in html and 'data-tab="mapa"' in html, "A nova investigacao nao esta ligada a interface"
+    for marcador in ("lulaPp", "flavioPp", "lulaVotes", "flavioVotes", "both"):
+        assert marcador in mapa_script, f"Campo de calculo do mapa ausente: {marcador}"
     a = {chave(x): x for x in votos["municipios"]}
     b = {chave(x): x for x in part["municipios"]}
     assert len(a) == len(votos["municipios"]), "Locais repetidos na base de votos"
@@ -82,6 +86,36 @@ def conferir():
         if m1 == 0 or m2 == 0:
             empates += 1
     print(f"Viradas municipais: Flavio -> Lula: {mudou_lula}; Lula -> Flavio: {mudou_flavio}; empate em algum turno: {empates}")
+    # Verificacao independente do estudo 07: crescimento por municipio,
+    # incluindo sobreposicoes. Sem somar o exterior (ZZ) nem contar duas vezes.
+    turno1 = {(x["uf"], str(int(x["codigo"]))): x
+              for x in votos["municipios"] if int(x["turno"]) == 1 and x["uf"] != "ZZ"}
+    turno2 = {(x["uf"], str(int(x["codigo"]))): x
+              for x in votos["municipios"] if int(x["turno"]) == 2 and x["uf"] != "ZZ"}
+    contagem = {"municipios": 0, "lula_pp": 0, "flavio_pp": 0, "ambos_pp": 0,
+                "lula_votos": 0, "flavio_votos": 0, "ambos_votos": 0}
+    for chave_municipal, primeiro in turno1.items():
+        segundo = turno2.get(chave_municipal)
+        if not segundo or not primeiro["validos"] or not segundo["validos"]:
+            continue
+        v1, v2 = primeiro["votos"], segundo["votos"]
+        vl1, vf1 = int(v1.get("13", 0)), int(v1.get("22", 0))
+        vl2, vf2 = int(v2.get("13", 0)), int(v2.get("22", 0))
+        lula_pp = vl2 / segundo["validos"] - vl1 / primeiro["validos"]
+        flavio_pp = vf2 / segundo["validos"] - vf1 / primeiro["validos"]
+        lula_votos, flavio_votos = vl2 - vl1, vf2 - vf1
+        contagem["municipios"] += 1
+        contagem["lula_pp"] += lula_pp > 0
+        contagem["flavio_pp"] += flavio_pp > 0
+        contagem["ambos_pp"] += lula_pp > 0 and flavio_pp > 0
+        contagem["lula_votos"] += lula_votos > 0
+        contagem["flavio_votos"] += flavio_votos > 0
+        contagem["ambos_votos"] += lula_votos > 0 and flavio_votos > 0
+    referencias = {"municipios": 5571, "lula_pp": 5567, "flavio_pp": 3827,
+                   "ambos_pp": 3823, "lula_votos": 5491, "flavio_votos": 4624,
+                   "ambos_votos": 4619}
+    assert contagem == referencias, f"Auditoria estudo 07: {contagem} difere de {referencias}"
+    print("Estudo 07 auditado: " + ", ".join(f"{k}={v}" for k, v in contagem.items()))
     print(f"Conferencia aprovada: {len(a):,} localidades/turnos de votos e {len(b):,} de participacao.".replace(",", "."))
 
 
